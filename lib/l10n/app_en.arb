@@ -1,0 +1,569 @@
+{
+  "@@locale": "en",
+  "onboarding_title": "Notes (Closed Alpha)",
+  "@onboarding_title": {
+    "description": "Onboarding title"
+  },
+  "onboarding_description": "Thank you for testing Vocabualize. This app is part of my bachelor thesis on user-generated content in e-learning applications. It is a prototype that is still missing features and may contain an increased number of bugs.\n\nImportant notes on data usage:",
+  "@onboarding_description": {
+    "description": "Onboarding description"
+  },
+  "onboarding_hints": "• PURPOSE: Usage data is collected to evaluate the app concept and then analyzed anonymously - all exclusively as part of my bachelor thesis!\n\n• SECURITY: Data is stored on a protected server with access restrictions (but not encrypted).\n\n• DELETION: After completion of the test phase (6 months at the latest), all personal data will be irrevocably deleted - unless you explicitly activate the option \"Preserve data after test phase\" in the settings for a later app publication.\n\n• CONTROL: You can have your data deleted at any time - simply send an email to \"tim_david.friedrich@stud.htwk-leipzig.de\".",
+  "@onboarding_hints": {
+    "description": "Onboarding hints"
+  },
+  "onboarding_open_source": "The app code is open-source and can be viewed on GitHub (vocabualize.de).",
+  "@onboarding_open_source": {
+    "description": "Onboarding open source description part after the privacy hints."
+  },
+  "onboarding_final_words": "Feel free to contact me with questions, feedback, and bugs!\n\nHave fun testing! <3",
+  "@onboarding_final_words": {
+    "description": "Onboarding final words"
+  },
+  "onboarding_accept_button": "Accept",
+  "@onboarding_accept_button": {
+    "description": "Onboarding accept button text"
+  },
+  "offline_hint": "You are currently offline. Please connect to the Internet to use Vocabualize.",
+  "@offline_hint": {
+    "description": "Offline hint text"
+  },
+  "offline_internet_settings_button": "Internet settings",
+  "@offline_internet_settings_button": {
+    "description": "Offline check connection button text"
+  },
+  "offline_info_title": "Why?",
+  "@offline_info_title": {
+    "description": "Offline info dialog title"
+  },
+  "offline_info_description": "Vocabualize uses the internet to translate words, find matching images and save your vocabulary. In addition, user behavior is being analyzed as part of my bachelor thesis in order to evaluate the app concept.\n\nAfter the current test phase, it will also be possible to use certain functions, such as practicing, offline.\n\nThank you for being part of it! <3",
+  "@offline_info_description": {
+    "description": "Offline info dialog description"
+  },
+  "notification_channel_name_gather": "Gather vocabularies",
+  "@notification_channel_name_gather": {
+    "description": "Gather notification channel name"
+  },
+  "notification_channel_description_gather": "Look around you 👀",
+  "@notification_channel_description_gather": {
+    "description": "Gather notification channel description"
+  },
+  "notification_gather_title": "Look around you 👀",
+  "@notification_gather_title": {
+    "description": "Title for gather notification"
+  },
+  "notification_gather_body": "Which things don't you know in {sourceLanguage} yet? \nLet's add them to your collection!",
+  "@notification_gather_body": {
+    "description": "Body for gather notification",
+    "placeholders": {
+      "sourceLanguage": {
+        "type": "String",
+        "example": "Spanish"
+      }
+    }
+  },
+  "notification_channel_name_practice": "Practice vocabularies",
+  "@notification_channel_name_practice": {
+    "description": "Practice notification channel name"
+  },
+  "notification_channel_description_practice": "Let's practice 🎯",
+  "@notification_channel_description_practice": {
+    "description": "Practice notification channel description"
+  },
+  "notification_practice_title": "Let's practice 🎯",
+  "@notification_practice_title": {
+    "description": "Title for practice notification"
+  },
+  "notification_practice_body": "Some vocabularies may be due. You'll rock this! :D",
+  "@notification_practice_body": {
+    "description": "Body for practice notification"
+  },
+  "details_source_input_label": "Source",
+  "@details_source_input_label": {
+    "description": "Details source input label"
+  },
+  "details_target_input_label": "Target",
+  "@details_target_input_label": {
+    "description": "Details target input label"
+  },
+  "details_report_faulty_translation": "Report faulty translation",
+  "@details_report_faulty_translation": {
+    "description": "Details report faulty translation button text"
+  },
+  "details_photo_by": "Photo by {author}",
+  "@details_photo_by": {
+    "description": "Details photo by text",
+    "placeholders": {
+      "author": {
+        "type": "String",
+        "example": "Reiner Zufall"
+      }
+    }
+  },
+  "details_replace_dialog_title": "Replace",
+  "@details_replace_dialog_title": {
+    "description": "Replace dialog title"
+  },
+  "details_replace_dialog_content": "Retranslate and replace the vocabulary?",
+  "@details_replace_dialog_content": {
+    "description": "Replace dialog content"
+  },
+  "details_replace_dialog_action": "Replace?",
+  "@details_replace_dialog_action": {
+    "description": "Replace dialog action button text"
+  },
+  "details_duplicate_dialog_title": "Duplicate!",
+  "@details_duplicate_dialog_title": {
+    "description": "Duplicate dialog title"
+  },
+  "details_duplicate_dialog_content_1": "It seems that",
+  "@details_duplicate_dialog_content_1": {
+    "description": "Duplicate dialog content 1"
+  },
+  "details_duplicate_dialog_content_2": "already exists in your collection.\n\nAdd it anyway?",
+  "@details_duplicate_dialog_content_2": {
+    "description": "Duplicate dialog content 2"
+  },
+  "details_duplicate_dialog_action": "Add",
+  "@details_duplicate_dialog_action": {
+    "description": "Duplicate dialog action button text"
+  },
+  "common_select_language": "Select language",
+  "@common_select_language": {
+    "description": "Common select language text"
+  },
+  "common_vocabulary_created_label": "Created:",
+  "@common_vocabulary_created_label": {
+    "description": "Common created label"
+  },
+  "common_vocabulary_reappears_label": "Reappears:",
+  "@common_vocabulary_reappears_label": {
+    "description": "Common reappears label"
+  },
+  "common_close": "Close",
+  "@common_close": {
+    "description": "Common close text"
+  },
+  "common_unknown": "unknown",
+  "@common_unknown": {
+    "description": "Common unknown text"
+  },
+  "common_no": "No",
+  "@common_no": {
+    "description": "Common no text"
+  },
+  "common_yes": "Yes",
+  "@common_yes": {
+    "description": "Common yes text"
+  },
+  "common_okay": "Okay",
+  "@common_okay": {
+    "description": "Common okay text"
+  },
+  "common_cancel": "Cancel",
+  "@common_cancel": {
+    "description": "Common cancel text"
+  },
+  "common_submit": "Submit",
+  "@common_submit": {
+    "description": "Common submit text"
+  },
+  "home_vocabulary_reappears_now": "Now",
+  "@home_vocabulary_reappears_now": {
+    "description": "Reappears value text for now"
+  },
+  "home_vocabulary_reappears_less_minute": "In less than a minute",
+  "@home_vocabulary_reappears_less_minute": {
+    "description": "Reappears value text for less than a minute"
+  },
+  "home_vocabulary_reappears_minutes": "In {minutes} minutes",
+  "@home_vocabulary_reappears_minutes": {
+    "description": "Reappears value text for minutes",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "home_vocabulary_reappears_hours": "In {hours} hours",
+  "@home_vocabulary_reappears_hours": {
+    "description": "Reappears value text for hours",
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "home_vocabulary_reappears_days": "In {days} days",
+  "@home_vocabulary_reappears_days": {
+    "description": "Reappears value text for days",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "home_collections_title": "Collections",
+  "@home_collections_title": {
+    "description": "Collections section title"
+  },
+  "home_add_first_word": "Click the button\nto add your first word",
+  "@home_add_first_word": {
+    "description": "Gets displayed if the vocabularyList is empty."
+  },
+  "onboarding_select_source_language_title": "I speak",
+  "@onboarding_select_source_language_title": {
+    "description": "Onboarding source language title"
+  },
+  "onboarding_select_target_language_title": "I want to learn",
+  "@onboarding_select_target_language_title": {
+    "description": "Onboarding target language title"
+  },
+  "onboarding_done_action": "Let's start!",
+  "@onboarding_done_action": {
+    "description": "Onboarding done button text"
+  },
+  "onboarding_password_reset_title": "Reset password",
+  "@onboarding_password_reset_title": {
+    "description": "Onboarding password reset page title"
+  },
+  "onboarding_password_reset_description": "Enter your email address to receive a link to reset your password.",
+  "@onboarding_password_reset_description": {
+    "description": "Onboarding password reset page description"
+  },
+  "onboarding_password_reset_wait": "Wait {seconds} seconds",
+  "@onboarding_password_reset_wait": {
+    "description": "Onboarding password reset wait text",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "onboarding_password_reset_send": "Send link",
+  "@onboarding_password_reset_send": {
+    "description": "Onboarding password reset send button text"
+  },
+  "onboarding_email": "Email",
+  "@onboarding_email": {
+    "description": "Onboarding password reset email input label"
+  },
+  "onboarding_use_github": "Sign in with GitHub",
+  "@onboarding_use_github": {
+    "description": "Onboarding sign in with GitHub button text"
+  },
+  "onboarding_use_google": "Sign in with Google",
+  "@onboarding_use_google": {
+    "description": "Onboarding sign in with Google button text"
+  },
+  "onboarding_sign_failed_title": "Sign in failed",
+  "@onboarding_sign_failed_title": {
+    "description": "Onboarding sign in failed dialog title"
+  },
+  "onboarding_sign_failed_provider_description": "This account is already linked with {linkedProvider}.",
+  "@onboarding_sign_failed_provider_description": {
+    "description": "Onboarding sign in failed because of wrong provider dialog description",
+    "placeholders": {
+      "linkedProvider": {
+        "type": "String",
+        "example": "Google"
+      }
+    }
+  },
+  "core_disconnected": "You're offline",
+  "@core_disconnected": {
+    "description": "Offline pop up"
+  },
+  "core_disconnected_description": "An Internet connection is required for the translator to work. Please enable Wi-Fi or mobile data to add vocabularies.",
+  "@core_disconnected_description": {
+    "description": "Offline pop up description"
+  },
+  "core_disconnected_okayButton": "Okay",
+  "@core_disconnected_okayButton": {
+    "description": "Offline pop up okay button text"
+  },
+  "home_allWords": "All vocabularies",
+  "@home_allWords": {
+    "description": "All vocabualaries section title"
+  },
+  "home_newWords": "Recently added",
+  "@home_newWords": {
+    "description": "New vocabualaries section title."
+  },
+  "home_noNewWords": "Oh, it seems like you have not added any words for a while now.  :(",
+  "@home_noNewWords": {
+    "description": "Gets displayed in the new words section if there are no new words."
+  },
+  "home_statusCard_addedManyInTotal": "Damn, you added {listLength} words in total. Not bad!",
+  "@home_statusCard_addedManyInTotal": {
+    "description": "Status card text if you added more than a specific amount in total.",
+    "placeholders": {
+      "listLength": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "home_statusCard_addedToday": "Wow, you already added {listLength} words today. Keep it up!",
+  "@home_statusCard_addedToday": {
+    "description": "Status card text if you created multiple words today.",
+    "placeholders": {
+      "listLength": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "home_statusCard_default": "Your collection contains {listLength} words.",
+  "@home_statusCard_default": {
+    "description": "Default status card text.",
+    "placeholders": {
+      "listLength": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "home_statusCard_firstWord": "You added your first word! Add some more and hit \"practice\"! :)",
+  "@home_statusCard_firstWord": {
+    "description": "Status card text if the first word has been added."
+  },
+  "home_statusCard_isEmpty": "Why don't you add some new words? :)",
+  "@home_statusCard_isEmpty": {
+    "description": "Status card text if the vocabularyList is empty."
+  },
+  "home_statusCard_onlyOneWord": "Your collection contains only {listLength} word. It's feeling lonely. Add some more! :)",
+  "@home_statusCard_onlyOneWord": {
+    "description": "Status card text if the vocabularyList contains only one word.",
+    "placeholders": {
+      "listLength": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "home_statusCard_practiceButton": "Practice",
+  "@home_statusCard_practiceButton": {
+    "description": "Status card's practice button text"
+  },
+  "practice_done_title": "Congratulations!",
+  "@practice_done_title": {
+    "description": "Practice done title"
+  },
+  "practice_done_subtitle": "You've practiced all\nof your due words.",
+  "@practice_done_subtitle": {
+    "description": "Practice done subtitle"
+  },
+  "practice_done_action": "Done",
+  "@practice_done_action": {
+    "description": "Practice done action button text"
+  },
+  "practice_rating_didntKnowButton": "I didn't know",
+  "@practice_rating_didntKnowButton": {
+    "description": "Practice 'I didn't know' rating button text"
+  },
+  "practice_rating_easyButton": "Easy",
+  "@practice_rating_easyButton": {
+    "description": "Practice easy rating button text"
+  },
+  "practice_rating_goodButton": "Good",
+  "@practice_rating_goodButton": {
+    "description": "Practice good rating button text"
+  },
+  "practice_rating_hardButton": "Hard",
+  "@practice_rating_hardButton": {
+    "description": "Practice hard rating button text"
+  },
+  "practice_solutionButton": "Solution",
+  "@practice_solutionButton": {
+    "description": "Practice show solution button text"
+  },
+  "record_addButton": "Add",
+  "@record_addButton": {
+    "description": "Record sheet add button text"
+  },
+  "record_addDetails_noImage": "Choose an image\nor save without one",
+  "@record_addDetails_noImage": {
+    "description": "Gets displayed if no image has been selected"
+  },
+  "record_addDetails_openGalleryButton": "Open Gallery",
+  "@record_addDetails_openGalleryButton": {
+    "description": "Choose image from gallery button"
+  },
+  "record_addDetails_providedBy": "Images provided by Pexels.",
+  "@record_addDetails_providedBy": {
+    "description": "Note that the stockimages are provided by Pexels"
+  },
+  "record_addDetails_saveButton": "Save",
+  "@record_addDetails_saveButton": {
+    "description": "Save AddDetails button text"
+  },
+  "record_addDetails_saveWithoutButton": "Save without",
+  "@record_addDetails_saveWithoutButton": {
+    "description": "Save without image button text"
+  },
+  "record_addDetails_takePictureButton": "Take picture",
+  "@record_addDetails_takePictureButton": {
+    "description": "Take picture button"
+  },
+  "record_addTagHint": "Untitled",
+  "@record_addTagHint": {
+    "description": "Hint in the add tag dialog text field"
+  },
+  "record_addTagLabel": "Tag name",
+  "@record_addTagLabel": {
+    "description": "Label of the add tag dialog text field"
+  },
+  "record_closeButton": "Close",
+  "@record_closeButton": {
+    "description": "Record sheet close button text"
+  },
+  "record_savedMessage_deleteButton": "Delete",
+  "@record_savedMessage_deleteButton": {
+    "description": "Delete button in the saved message snackbar"
+  },
+  "record_type": "Type in word...",
+  "@record_type": {
+    "description": "Record type instead text field"
+  },
+  "record_fab_scan": "Scan",
+  "@record_fab_scan": {
+    "description": "Record fab scan option label"
+  },
+  "record_fab_speak": "Speak",
+  "@record_fab_speak": {
+    "description": "Record fab speak option label"
+  },
+  "record_fab_write": "Write",
+  "@record_fab_write": {
+    "description": "Record fab write option label"
+  },
+  "record_suggestions_label": "Suggestions",
+  "@record_suggestions_label": {
+    "description": "Record sheet suggestions label"
+  },
+  "record_suggestions_empty": "No objects could be recognized. Please try again later.",
+  "@record_suggestions_empty": {
+    "description": "Gets displayed if no objects could be recognized."
+  },
+  "report_bug_title": "Report bug",
+  "@report_bug_title": {
+    "description": "Report bug page title"
+  },
+  "report_translation_title": "Faulty translation",
+  "@report_translation_title": {
+    "description": "Report translation page title"
+  },
+  "report_bug_description_hint": "Description the bug...",
+  "@report_bug_description_hint": {
+    "description": "Report bug description hint for text field"
+  },
+  "report_translation_note_hint": "Note (optional)",
+  "@report_translation_note_hint": {
+    "description": "Report translation note hint for text field"
+  },
+  "settings_title": "Settings",
+  "@settings_title": {
+    "description": "Settings page title"
+  },
+  "settings_sign_in_hint": "Sign in to sync your data across devices.",
+  "@settings_sign_in_hint": {
+    "description": "Settings sign in hint for profile container"
+  },
+  "settings_sign_in_action": "Sign in",
+  "@settings_sign_in_action": {
+    "description": "Settings sign in button text"
+  },
+  "settings_keep_data": "Preserve data after test phase",
+  "@settings_keep_data": {
+    "description": "Settings authorise keeping data hint"
+  },
+  "settings_keep_data_hint": "(absolutely optional!)",
+  "@settings_keep_data_hint": {
+    "description": "Settings authorise keeping data hint"
+  },
+  "settings_keep_data_dialog_title": "Preserve data?",
+  "@settings_keep_data_dialog_title": {
+    "description": "Settings keep data dialog title"
+  },
+  "settings_keep_data_dialog_content": "All user data will be deleted after the test phase. If you want your data to remain stored, you must explicitly allow this. In this case, your data can continue to be used if the application is published.\n\nIf the app is not published or if there are other reasons against further use, all data will still be deleted.",
+  "@settings_keep_data_dialog_content": {
+    "description": "Settings keep data dialog content"
+  },
+  "settings_experimental_show": "Show experimental",
+  "@settings_experimental_show": {
+    "description": "Settings show experiment settings button text"
+  },
+  "settings_experimental_hide": "Hide experimental",
+  "@settings_experimental_hide": {
+    "description": "Settings hide experiment settings button text"
+  },
+  "settings_collections": "Enable collections",
+  "@settings_collections": {
+    "description": "Settings page collections label"
+  },
+  "settings_collectionsHint": "Categorise words in collections",
+  "@settings_collectionsHint": {
+    "description": "Hint, that collections group vocabularies"
+  },
+  "settings_images": "Hide images",
+  "@settings_images": {
+    "description": "Settings page image deactivation label"
+  },
+  "settings_imagesHint": "Could decrease learning quality",
+  "@settings_imagesHint": {
+    "description": "Hint, that images are good for learning"
+  },
+  "settings_source": "Source language",
+  "@settings_source": {
+    "description": "Settings page source language label"
+  },
+  "settings_sourceHint": "A language you know well",
+  "@settings_sourceHint": {
+    "description": "Explanation of the source language"
+  },
+  "settings_target": "Target language",
+  "@settings_target": {
+    "description": "Settings page target language label"
+  },
+  "settings_targetHint": "The language you learn",
+  "@settings_targetHint": {
+    "description": "Explanation of the target language"
+  },
+  "settings_deepl_title": "Use DeepL translator",
+  "@settings_deepl_title": {
+    "description": "Settings deepl switch title"
+  },
+  "settings_deepl_hint": "Could affect translation quality",
+  "@settings_deepl_hint": {
+    "description": "Settings deepl switch description"
+  },
+  "settings_notifications_title": "Toggle notifications",
+  "@settings_notifications_title": {
+    "description": "Settings notifications button text to open app settings"
+  },
+  "settings_notifications_hint": "Open app system settings to manage",
+  "@settings_notifications_hint": {
+    "description": "Settings notifications switch description"
+  },
+  "settings_gather_title": "Time to gather",
+  "@settings_gather_title": {
+    "description": "Settings gather notifications switch title"
+  },
+  "settings_gather_hint": "Time for notification to gather new words, if enabled",
+  "@settings_gather_hint": {
+    "description": "Settings gather notifications switch description"
+  },
+  "settings_practice_title": "Time to practice",
+  "@settings_practice_title": {
+    "description": "Settings practice notifications switch title"
+  },
+  "settings_practice_hint": "Time for notification to practice, if enabled",
+  "@settings_practice_hint": {
+    "description": "Settings practice notifications switch description"
+  }
+}

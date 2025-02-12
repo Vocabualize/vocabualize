@@ -1,0 +1,84 @@
+name: vocabualize
+description: Capture vocabularies around you.
+
+publish_to: 'none'
+version: 0.1.1+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+
+  # android only
+  speech_to_text_google_dialog: ^0.0.6
+  
+  # functionality
+  app_settings: ^5.2.0
+  cached_network_image: ^3.4.1
+  camera: ^0.10.6
+  collection: ^1.18.0
+  device_info_plus: ^11.3.0
+  flutter_image_compress: ^2.0.4
+  flutter_local_notifications: ^17.2.1+2
+  flutter_riverpod: ^2.5.1
+  flutter_secure_storage: ^9.2.2
+  flutter_svg: ^2.0.17
+  flutter_timezone: ^2.1.0
+  galli_text_to_speech: ^0.0.1
+  #google_mlkit_image_labeling: ^0.13.0
+  http: ^1.1.0
+  image_picker: ^1.0.4
+  internet_connection_checker_plus: ^2.7.0
+  intl: ^0.19.0
+  mime: ^2.0.0
+  package_info_plus: ^8.2.0
+  path: ^1.9.0
+  path_provider: ^2.1.5
+  permission_handler: ^11.3.1
+  pocketbase: ^0.18.1
+  provider: ^6.0.3
+  shared_preferences: ^2.0.18
+  timezone: ^0.9.4
+  translator_plus: ^1.0.1
+  url_launcher: ^6.1.10
+
+  # styling
+  cupertino_icons: ^1.0.2
+  google_fonts: ^6.2.1
+
+  # own packages
+  log:
+    path: ./packages/log
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^4.0.0
+
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/icons/ic_github.svg
+    - assets/icons/ic_google.svg
+    - assets/images/mascot/mascot_hanging.webp
+    - assets/images/mascot/mascot_idle.webp
+    - assets/images/mascot/mascot_search.webp
+    - assets/images/mascot/mascot_offline.webp
+    - assets/images/fallback/fallback_default.webp
+    #- assets/ml_models/efficientnet_lite4-fp32.tflite
+
+
+flutter_intl:
+  enabled: true
+  class_name: AppLocalizations

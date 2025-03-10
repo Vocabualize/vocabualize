@@ -26,6 +26,7 @@ import 'package:vocabualize/src/features/home/presentation/states/home_state.dar
 import 'package:vocabualize/src/common/presentation/widgets/vocabulary_info_dialog.dart';
 import 'package:vocabualize/src/features/record/presentation/screens/record_screen.dart';
 import 'package:vocabualize/src/common/presentation/widgets/text_input_dialog.dart';
+import 'package:vocabualize/src/common/presentation/widgets/duplicate_dialog.dart';
 import 'package:vocabualize/src/features/settings/presentation/screens/settings_screen.dart';
 
 final homeControllerProvider = AutoDisposeAsyncNotifierProvider<HomeController, HomeState>(() {
@@ -65,8 +66,10 @@ class HomeController extends AutoDisposeAsyncNotifier<HomeState> {
     // * SpeechToTextGoogleDialog works for Android only
     await SpeechToTextGoogleDialog.getInstance().showGoogleDialog(
       onTextReceived: (text) async {
-        _translateAndGoToDetails(context, text);
-        ref.read(trackEventUseCaseProvider)(TrackingConstants.gatherSpeak);
+        _proceedIfNotDuplicate(context, text, () {
+          _translateAndGoToDetails(context, text);
+          ref.read(trackEventUseCaseProvider)(TrackingConstants.gatherSpeak);
+        });
       },
       locale: sourceLanguage.textToSpeechId,
     );
@@ -77,10 +80,24 @@ class HomeController extends AutoDisposeAsyncNotifier<HomeState> {
       onCancel: context.pop,
       onSave: (text) {
         context.pop();
-        _translateAndGoToDetails(context, text);
-        ref.read(trackEventUseCaseProvider)(TrackingConstants.gatherWrite);
+        _proceedIfNotDuplicate(context, text, () {
+          _translateAndGoToDetails(context, text);
+          ref.read(trackEventUseCaseProvider)(TrackingConstants.gatherWrite);
+        });
       },
     ));
+  }
+
+  void _proceedIfNotDuplicate(BuildContext context, String text, VoidCallback onProceed) {
+    final alreadyExists = state.valueOrNull?.containsSource(text) ?? false;
+    if (alreadyExists) {
+      context.showDialog(DuplicateDialog(
+        source: text,
+        onProceed: onProceed,
+      ));
+    } else {
+      onProceed();
+    }
   }
 
   Future<void> _translateAndGoToDetails(BuildContext context, String text) async {

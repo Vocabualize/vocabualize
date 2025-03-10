@@ -47,9 +47,10 @@ class WelcomeScreen extends ConsumerWidget {
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),
                   ),
+                  const SizedBox(height: Dimensions.semiSmallSpacing),
                   if (latestAlert != null) ...[
-                    const SizedBox(height: Dimensions.semiSmallSpacing),
                     AlertContainer(alert: latestAlert),
+                    const SizedBox(height: Dimensions.largeSpacing),
                   ],
                   Expanded(
                     child: Image.asset(
@@ -65,6 +66,7 @@ class WelcomeScreen extends ConsumerWidget {
                       },
                     ),
                   ),
+                  const SizedBox(height: Dimensions.semiLargeSpacing),
                   ProviderButton(
                     onPressed: () => ref.read(notifier).signInWithGithub(context),
                     icon: SvgPicture.asset(AssetPath.icGithub),
@@ -78,7 +80,12 @@ class WelcomeScreen extends ConsumerWidget {
                     title: context.s.onboarding_use_google,
                     isLoading: state.loadingProvider == AuthProvider.google,
                   ),
-                  const SizedBox(height: Dimensions.extraLargeSpacing),
+                  const SizedBox(height: Dimensions.mediumSpacing),
+                  OutlinedButton(
+                    onPressed: ref.read(notifier).signInAnonymously,
+                    child: Text(context.s.onboarding_anonymous),
+                  ),
+                  const SizedBox(height: Dimensions.largeSpacing),
                 ],
               ),
             ),

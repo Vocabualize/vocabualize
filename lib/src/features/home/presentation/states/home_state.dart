@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 import 'package:vocabualize/src/common/domain/entities/alert.dart';
 import 'package:vocabualize/src/common/domain/entities/tag.dart';
 import 'package:vocabualize/src/common/domain/entities/vocabulary.dart';
@@ -25,6 +23,10 @@ class HomeState {
     required this.areImagesDisabled,
   });
 
+  bool containsSource(String source) {
+    return vocabularies.any((v) => v.source == source);
+  }
+
   HomeState copyWith({
     int? streak,
     bool? isStreakActive,
@@ -45,31 +47,4 @@ class HomeState {
       areImagesDisabled: areImagesDisabled ?? this.areImagesDisabled,
     );
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is HomeState &&
-        other.streak == streak &&
-        other.isStreakActive == isStreakActive &&
-        const DeepCollectionEquality().equals(other.alerts, alerts) &&
-        const DeepCollectionEquality().equals(other.vocabularies, vocabularies) &&
-        const DeepCollectionEquality().equals(other.newVocabularies, newVocabularies) &&
-        const DeepCollectionEquality().equals(other.tags, tags) &&
-        areCollectionsEnabled == other.areCollectionsEnabled &&
-        areImagesDisabled == other.areImagesDisabled;
-  }
-
-  @override
-  int get hashCode => Object.hashAll([
-        streak,
-        isStreakActive,
-        const DeepCollectionEquality().hash(alerts),
-        const DeepCollectionEquality().hash(vocabularies),
-        const DeepCollectionEquality().hash(newVocabularies),
-        const DeepCollectionEquality().hash(tags),
-        areCollectionsEnabled,
-        areImagesDisabled
-      ]);
 }

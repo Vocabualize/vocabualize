@@ -7,6 +7,8 @@ extension LanguageExtensions on Language {
     return switch (context.s.localeName) {
       "de" => nameDe,
       "es" => nameEs,
+      "fr" => nameFr,
+      "uk" => nameUk,
       _ => name,
     };
   }

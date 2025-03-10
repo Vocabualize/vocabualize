@@ -81,6 +81,18 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
+  Future<bool> getIsTypeAnswerModeDisabled() async {
+    final isTypeAnswerModeDisabled =
+        await _sharedPreferencesDataSource.getIsTypeAnswerModeDisabled();
+    return isTypeAnswerModeDisabled ?? CommonConstants.isTypeAnswerModeDisabled;
+  }
+
+  @override
+  Future<void> setIsTypeAnswerModeDisabled(bool isTypeAnswerModeDisabled) async {
+    await _sharedPreferencesDataSource.setIsTypeAnswerModeDisabled(isTypeAnswerModeDisabled);
+  }
+
+  @override
   Future<bool> getAreCollectionsEnabled() async {
     final areCollectionsEnabled = await _sharedPreferencesDataSource.getAreCollectionsEnabled();
     return areCollectionsEnabled ?? CommonConstants.areCollectionsEnabled;
@@ -100,17 +112,6 @@ class SettingsRepositoryImpl implements SettingsRepository {
   @override
   Future<void> setAreImagesDisabled(bool areImagesDisabled) async {
     await _sharedPreferencesDataSource.setAreImagesDisabled(areImagesDisabled);
-  }
-
-  @override
-  Future<bool> getUsePremiumTranslator() async {
-    final usePremiumTranslator = await _sharedPreferencesDataSource.getUsePremiumTranslator();
-    return usePremiumTranslator ?? CommonConstants.usePremiumTranslator;
-  }
-
-  @override
-  Future<void> setUsePremiumTranslator(bool usePremiumTranslator) async {
-    await _sharedPreferencesDataSource.setUsePremiumTranslator(usePremiumTranslator);
   }
 
   @override

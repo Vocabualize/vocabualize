@@ -1,1 +1,1 @@
-enum AuthProvider { none, github, google }
+enum AuthProvider { none, anonymous, github, google }

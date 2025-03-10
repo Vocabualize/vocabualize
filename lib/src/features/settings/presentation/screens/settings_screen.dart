@@ -25,6 +25,14 @@ class SettingsScreen extends ConsumerWidget {
       return s.value?.showExperimental ?? false;
     }));
 
+    final isSignedIn = ref.watch(settingsControllerProvider.select((s) {
+      return s.value?.currentUser?.isSignedIn ?? false;
+    }));
+
+    final isAnonymous = ref.watch(settingsControllerProvider.select((s) {
+      return s.value?.currentUser?.isAnonymous ?? false;
+    }));
+
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
@@ -34,38 +42,82 @@ class SettingsScreen extends ConsumerWidget {
           child: Text(context.s.settings_title),
         ),
         actions: const [
-          _BugReportButton(),
-          _OnboardingButton(),
+          _FeedbackButton(),
+          _ThreeDotsMenu(),
           SizedBox(width: Dimensions.largeSpacing),
         ],
       ),
-      body: Padding(
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: Dimensions.largeSpacing),
+        physics: const BouncingScrollPhysics(),
+        children: [
+          const SizedBox(height: Dimensions.mediumSpacing),
+          if (isSignedIn)
+            const _ProfileContainer()
+          else if (isAnonymous)
+            const _AnonymousProfileContainer(),
+          const SizedBox(height: Dimensions.semiLargeSpacing),
+          const _SourceLanguageSettingsTile(),
+          const _TargetLanguageSettingsTile(),
+          const _OpenNotificationSettingsButton(),
+          if (kDebugMode) ...[
+            const _GatherNotificationTimeSettingsTile(),
+            const _PracticeNotificationTimeSettingsTile(),
+          ],
+          if (isSignedIn) const _KeepDataSettingsTile(),
+          const SizedBox(height: Dimensions.mediumSpacing),
+          const _ToggleExperimentalButton(),
+          const SizedBox(height: Dimensions.mediumSpacing),
+          if (showExperimental) ...[
+            const _DisablePracticeTextAnswerSettingsTile(),
+            const _EnableCollectionsSettingsTile(),
+            const _HideImagesSettingsTile(),
+          ],
+          const SizedBox(height: Dimensions.extraLargeSpacing),
+        ],
+      ),
+    );
+  }
+}
+
+class _FeedbackButton extends ConsumerWidget {
+  const _FeedbackButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = settingsControllerProvider.notifier;
+    return InkWell(
+      onTap: () => ref.read(notifier).openSurvey(context),
+      borderRadius: BorderRadius.circular(Dimensions.smallBorderRadius),
+      child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: Dimensions.largeSpacing,
+          horizontal: Dimensions.mediumSpacing,
+          vertical: Dimensions.smallSpacing,
         ),
-        child: ListView(
-          physics: const BouncingScrollPhysics(),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(Dimensions.smallBorderRadius),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary,
+            width: Dimensions.mediumBorderWidth,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: Dimensions.mediumSpacing),
-            const _ProfileContainer(),
-            const SizedBox(height: Dimensions.semiLargeSpacing),
-            const _SourceLanguageSettingsTile(),
-            const _TargetLanguageSettingsTile(),
-            const _OpenNotificationSettingsButton(),
-            if (kDebugMode) ...[
-              const _GatherNotificationTimeSettingsTile(),
-              const _PracticeNotificationTimeSettingsTile(),
-            ],
-            const _KeepDataSettingsTile(),
-            const SizedBox(height: Dimensions.mediumSpacing),
-            const _ToggleExperimentalButton(),
-            const SizedBox(height: Dimensions.mediumSpacing),
-            if (showExperimental) ...[
-              const _EnabledCollectionsSettingsTile(),
-              const _HideImagesSettingsTile(),
-              const _PremiumTranslatorSettingsTile(),
-            ],
-            const SizedBox(height: Dimensions.extraLargeSpacing),
+            Icon(
+              Icons.feedback_rounded,
+              size: Dimensions.semiSmallIconSize,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            const SizedBox(width: Dimensions.smallSpacing),
+            Text(
+              context.s.settings_feedback,
+              style: Theme.of(context)
+                  .textTheme
+                  .labelMedium
+                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+            ),
           ],
         ),
       ),
@@ -73,28 +125,85 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-class _BugReportButton extends ConsumerWidget {
-  const _BugReportButton();
+class _ThreeDotsMenu extends ConsumerWidget {
+  const _ThreeDotsMenu();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = settingsControllerProvider.notifier;
-    return IconButton(
-      onPressed: () => ref.read(notifier).goToBugReport(context),
-      icon: const Icon(Icons.bug_report_rounded),
+    return PopupMenuButton(
+      itemBuilder: (context) {
+        return [
+          PopupMenuItem(
+            onTap: () => ref.read(settingsControllerProvider.notifier).goToBugReport(context),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.bug_report_rounded),
+                const SizedBox(width: Dimensions.smallSpacing),
+                Text(context.s.report_bug_title),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            onTap: () => ref.read(settingsControllerProvider.notifier).goToOnboarding(context),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.description_rounded),
+                const SizedBox(width: Dimensions.smallSpacing),
+                Text(context.s.onboarding_title),
+              ],
+            ),
+          ),
+        ];
+      },
     );
   }
 }
 
-class _OnboardingButton extends ConsumerWidget {
-  const _OnboardingButton();
+class _AnonymousProfileContainer extends ConsumerWidget {
+  const _AnonymousProfileContainer();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = settingsControllerProvider.notifier;
-    return IconButton(
-      onPressed: () => ref.read(notifier).goToOnboarding(context),
-      icon: const Icon(Icons.description_rounded),
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimensions.mediumSpacing,
+        vertical: Dimensions.mediumSpacing,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(Dimensions.mediumBorderRadius),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Material(
+            child: InkWell(
+              onLongPress: ref.read(notifier).copyId,
+              // * GestureDector and AbsorbPointer prevent onTap ripple
+              child: GestureDetector(
+                onTap: () {},
+                child: ExcludeSemantics(
+                  child: AbsorbPointer(
+                    child: Text(context.s.settings_sign_in_hint),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: Dimensions.semiSmallSpacing),
+          Align(
+            alignment: Alignment.topRight,
+            child: ElevatedButton(
+              onPressed: () => ref.read(notifier).goToAnonymousAccountLinking(context),
+              child: Text(context.s.settings_sign_in_action),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -106,7 +215,6 @@ class _ProfileContainer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = settingsControllerProvider.notifier;
     final currentUser = ref.watch(settingsControllerProvider.select((s) {
-      // * If anonymous users should be allowed again, remove the null check
       return s.value?.currentUser ?? const AppUser();
     }));
     return Container(
@@ -119,52 +227,41 @@ class _ProfileContainer extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // * If anonymous users should be allowed again, uncomment
-          // if (currentUser != null) ...[
           const _ProfilePicture(),
           const SizedBox(width: Dimensions.mediumSpacing),
-          // ],
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // * If anonymous users should be allowed again, uncomment
-                // if (currentUser != null) ...[
-                Text(currentUser.displayName),
-                const SizedBox(height: Dimensions.extraSmallSpacing),
-                Text(
-                  currentUser.info,
-                  style: Theme.of(context).textTheme.bodySmall,
-                  overflow: TextOverflow.fade,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-                // * If anonymous users should be allowed again, uncomment
-                // ] else ...[
-                //   Text(context.s.settings_sign_in_hint),
-                //   const SizedBox(height: Dimensions.smallSpacing),
-                //   Align(
-                //     alignment: Alignment.topRight,
-                //     child: ElevatedButton(
-                //       onPressed: () => ref.read(notifier).signIn(context),
-                //       child: Text(context.s.settings_sign_in_action),
-                //     ),
-                //   ),
-                // ],
+                if (currentUser.isSignedIn) ...[
+                  Text(
+                    currentUser.displayName,
+                    overflow: TextOverflow.fade,
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
+                  const SizedBox(height: Dimensions.extraSmallSpacing),
+                  Text(
+                    currentUser.info,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    overflow: TextOverflow.fade,
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
+                ],
               ],
             ),
           ),
-          // * If anonymous users should be allowed again, uncomment
-          // if (currentUser != null) ...[
-          const SizedBox(width: Dimensions.smallSpacing),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              ref.read(notifier).signOut(context);
-            },
-          ),
-          // ],
+          if (currentUser.isSignedIn) ...[
+            const SizedBox(width: Dimensions.smallSpacing),
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () {
+                ref.read(notifier).signOut(context);
+              },
+            ),
+          ],
         ],
       ),
     );
@@ -336,8 +433,29 @@ class _ToggleExperimentalButton extends ConsumerWidget {
   }
 }
 
-class _EnabledCollectionsSettingsTile extends ConsumerWidget {
-  const _EnabledCollectionsSettingsTile();
+class _DisablePracticeTextAnswerSettingsTile extends ConsumerWidget {
+  const _DisablePracticeTextAnswerSettingsTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = settingsControllerProvider.notifier;
+    final isTypeAnswerModeDisabled = ref.watch(settingsControllerProvider.select((s) {
+      return s.value?.isTypeAnswerModeDisabled ?? false;
+    }));
+
+    return _SettingsListTile(
+      title: context.s.settings_disable_type_answer_mode,
+      subtitle: context.s.settings_disable_type_answer_mode_hint,
+      trailing: Switch(
+        value: isTypeAnswerModeDisabled,
+        onChanged: ref.read(notifier).setIsTypeAnswerModeDisabled,
+      ),
+    );
+  }
+}
+
+class _EnableCollectionsSettingsTile extends ConsumerWidget {
+  const _EnableCollectionsSettingsTile();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -371,26 +489,6 @@ class _HideImagesSettingsTile extends ConsumerWidget {
       trailing: Switch(
         value: areImagesDisabled,
         onChanged: ref.read(notifier).setAreImagesDisabled,
-      ),
-    );
-  }
-}
-
-class _PremiumTranslatorSettingsTile extends ConsumerWidget {
-  const _PremiumTranslatorSettingsTile();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = settingsControllerProvider.notifier;
-    final usePremiumTranslator = ref.watch(settingsControllerProvider.select((s) {
-      return s.value?.usePremiumTranslator ?? false;
-    }));
-    return _SettingsListTile(
-      title: context.s.settings_deepl_title,
-      subtitle: context.s.settings_deepl_hint,
-      trailing: Switch(
-        value: usePremiumTranslator,
-        onChanged: ref.read(notifier).setUsePremiumTranslator,
       ),
     );
   }

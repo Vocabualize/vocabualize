@@ -20,9 +20,9 @@ class SharedPreferencesDataSource {
   final String _hasSeenLanguageSelectionKey = "key.has.seen.language.selection";
   final String _sourceLanguageCodeKey = "key.source.language.code";
   final String _targetLanguageCodeKey = "key.target.language.code";
+  final String _isTypeAnswerModeDisabledKey = "key.is.type.answer.mode.disabled";
   final String _areCollectionsEnabledKey = "key.are.collections.enabled";
   final String _areImagesDisabledKey = "key.are.images.disabled";
-  final String _usePremiumTranslatorKey = "key.use.premium.translator";
   final String _initialIntervalKey = "key.initial.interval";
   final String _initialNoviceIntervalKey = "key.initial.novice.interval";
   final String _initialEaseKey = "key.initial.ease";
@@ -81,6 +81,17 @@ class SharedPreferencesDataSource {
     );
   }
 
+  Future<bool?> getIsTypeAnswerModeDisabled() async {
+    return await _sharedPreferences.getBool(_isTypeAnswerModeDisabledKey);
+  }
+
+  Future<void> setIsTypeAnswerModeDisabled(bool isTypeAnswerModeDisabled) async {
+    return await _sharedPreferences.setBool(
+      _isTypeAnswerModeDisabledKey,
+      isTypeAnswerModeDisabled,
+    );
+  }
+
   Future<bool?> getAreCollectionsEnabled() async {
     return await _sharedPreferences.getBool(_areCollectionsEnabledKey);
   }
@@ -100,17 +111,6 @@ class SharedPreferencesDataSource {
     return await _sharedPreferences.setBool(
       _areImagesDisabledKey,
       areImagesDisabled,
-    );
-  }
-
-  Future<bool?> getUsePremiumTranslator() async {
-    return await _sharedPreferences.getBool(_usePremiumTranslatorKey);
-  }
-
-  Future<void> setUsePremiumTranslator(bool usePremiumTranslator) async {
-    return await _sharedPreferences.setBool(
-      _usePremiumTranslatorKey,
-      usePremiumTranslator,
     );
   }
 
@@ -262,10 +262,10 @@ class SharedPreferencesDataSource {
       // * _hasSeenOnboardingKey,
       _hasSeenLanguageSelectionKey,
       _sourceLanguageCodeKey,
+      _isTypeAnswerModeDisabledKey,
       _targetLanguageCodeKey,
       _areCollectionsEnabledKey,
       _areImagesDisabledKey,
-      _usePremiumTranslatorKey,
       _initialIntervalKey,
       _initialNoviceIntervalKey,
       _initialEaseKey,

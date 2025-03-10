@@ -13,6 +13,7 @@ class Dimensions {
   static const double ultraLargeSpacing = 128.0;
 
   static const double scrollEndSpacing = ultraLargeSpacing;
+  static const double dialogMediumInsetSpacing = mediumSpacing;
   static const double dialogInsetSpacing = largeSpacing;
 
   static const double smallBorderWith = 1.5;
@@ -20,11 +21,14 @@ class Dimensions {
   static const double largeBorderWidth = 4.0;
 
   static const double smallBorderRadius = 8.0;
-  static const double semiSmallBorderRadius = 10.0;
+  static const double semiSemiSmallBorderRadius = 10.0;
+  static const double semiSmallBorderRadius = 12.0;
   static const double mediumBorderRadius = 16.0;
   static const double semiLargeBorderRadius = 24.0;
   static const double largeBorderRadius = 32.0;
 
-  static const double mediumIconSize = 16.0;
+  static const double smallIconSize = 16.0;
+  static const double semiSmallIconSize = 20.0;
+  static const double mediumIconSize = 24.0;
   static const double largeIconSize = 32.0;
 }

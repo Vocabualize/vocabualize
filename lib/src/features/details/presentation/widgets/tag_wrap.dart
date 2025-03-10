@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vocabualize/constants/dimensions.dart';
 import 'package:vocabualize/src/common/domain/entities/tag.dart';
 import 'package:vocabualize/src/common/domain/use_cases/tag/get_all_tags_use_case.dart';
+import 'package:vocabualize/src/common/presentation/extensions/context_extensions.dart';
 import 'package:vocabualize/src/features/details/presentation/controllers/details_controller.dart';
 import 'package:vocabualize/src/features/details/presentation/states/details_state.dart';
 
@@ -28,10 +29,9 @@ class TagWrap extends ConsumerWidget {
       data: (List<Tag> tags) {
         return Wrap(
           spacing: Dimensions.smallSpacing,
-          runSpacing: -Dimensions.smallSpacing,
           children: List.generate(tags.length + 1, (index) {
             if (index == tags.length) {
-              return _CreateButton(notifier: notifier);
+              return _CreateButton(notifier: notifier, noTagsAvailable: tags.isEmpty);
             }
             final tag = tags.elementAt(index);
             final isSelected = state.vocabulary.tagIds.contains(tag.id);
@@ -48,11 +48,21 @@ class TagWrap extends ConsumerWidget {
 }
 
 class _CreateButton extends ConsumerWidget {
+  final bool noTagsAvailable;
   final Refreshable<DetailsController> notifier;
-  const _CreateButton({required this.notifier});
+  const _CreateButton({required this.notifier, this.noTagsAvailable = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (noTagsAvailable) {
+      return TextButton.icon(
+        onPressed: () {
+          ref.read(notifier).openCreateTagDialogAndSave(context);
+        },
+        label: Text(context.s.details_add_tag),
+        icon: const Icon(Icons.add_rounded),
+      );
+    }
     return IconButton(
       onPressed: () {
         ref.read(notifier).openCreateTagDialogAndSave(context);

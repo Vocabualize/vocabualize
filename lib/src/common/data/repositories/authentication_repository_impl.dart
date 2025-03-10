@@ -5,22 +5,28 @@ import 'package:log/log.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:vocabualize/src/common/data/data_sources/authentication_data_source.dart';
 import 'package:vocabualize/src/common/data/data_sources/remote_connection_client.dart';
+import 'package:vocabualize/src/common/data/data_sources/remote_database_data_source.dart';
 import 'package:vocabualize/src/common/data/mappers/auth_mappers.dart';
 import 'package:vocabualize/src/common/data/mappers/auth_provider.mappers.dart';
 import 'package:vocabualize/src/common/domain/entities/app_user.dart';
 import 'package:vocabualize/src/common/domain/entities/auth_provider.dart';
+import 'package:vocabualize/src/common/domain/extensions/object_extensions.dart';
 import 'package:vocabualize/src/common/domain/repositories/authentication_repository.dart';
 
 final authenticationRepositoryProvider = Provider((ref) {
   return AuthenticationRepositoryImpl(
-    connectionClient: ref.watch(remoteConnectionClientProvider),
     authenticationDataSource: ref.watch(authenticationDataSourceProvider),
+    connectionClient: ref.watch(remoteConnectionClientProvider),
+    remoteDatabaseDataSource: ref.watch(remoteDatabaseDataSourceProvider),
   );
 });
 
 class AuthenticationRepositoryImpl implements AuthenticationRepository {
-  final RemoteConnectionClient _connectionClient;
+  final _usersCollectionName = "users";
+
   final AuthenticationDataSource _authenticationDataSource;
+  final RemoteConnectionClient _connectionClient;
+  final RemoteDatabaseDataSource _remoteDatabaseDataSource;
 
   final _userStreamController = StreamController<AppUser?>.broadcast();
   Stream<AppUser?> get stream {
@@ -28,54 +34,56 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   }
 
   AuthenticationRepositoryImpl({
-    required RemoteConnectionClient connectionClient,
     required AuthenticationDataSource authenticationDataSource,
-  })  : _connectionClient = connectionClient,
-        _authenticationDataSource = authenticationDataSource {
+    required RemoteConnectionClient connectionClient,
+    required RemoteDatabaseDataSource remoteDatabaseDataSource,
+  })  : _authenticationDataSource = authenticationDataSource,
+        _connectionClient = connectionClient,
+        _remoteDatabaseDataSource = remoteDatabaseDataSource {
     _initUserStream();
   }
 
   Future<void> _initUserStream() async {
     final PocketBase pocketbase = await _connectionClient.getConnection();
     _userStreamController.sink.add(pocketbase.authStore.toAppUser());
+    final currentUser = await _remoteDatabaseDataSource.getUser();
+    _userStreamController.sink.add(currentUser);
     _listenToUserChanges();
     Log.hint("User stream initialized");
   }
 
   void _listenToUserChanges() async {
     final PocketBase pocketbase = await _connectionClient.getConnection();
-    Future<void> Function()? userRecordSubscription;
+    Future<Future<void> Function()> userRecordSubscription(String userId) async {
+      return await pocketbase.collection(_usersCollectionName).subscribe(userId, (action) {
+        if (action.action == "update" || action.action == "delete") {
+          _userStreamController.sink.add(action.record?.toAppUser());
+        }
+      });
+    }
 
+    // * Listen to current user record changes
+    pocketbase.authStore.toAppUser()?.id?.let((userId) {
+      userRecordSubscription(userId);
+    });
+
+    // * Listen to auth changes + user record changes
     final authSubscription = pocketbase.authStore.onChange.map((event) {
       final record = event.model;
       if (record == null || record is! RecordModel) return null;
       return record.toAppUser();
     }).listen((user) async {
-      // Immediately update stream with current auth state
       _userStreamController.sink.add(user);
 
-      // Cancel previous subscription BEFORE handling logout
-      try {
-        await userRecordSubscription?.call();
-      } on ClientException catch (error) {
-        Log.warning("Unsubscribe error (safe to ignore): $error");
-      }
-
       final userId = user?.id;
-      if (userId == null) return; // No user = no subscription needed
-
-      // Create new subscription with valid auth
-      userRecordSubscription = await pocketbase.collection('users').subscribe(userId, (action) {
-        if (action.action == 'update' || action.action == 'delete') {
-          _userStreamController.sink.add(action.record?.toAppUser());
-        }
-      });
+      if (userId != null) {
+        userRecordSubscription(userId);
+      }
     });
 
     _userStreamController.onCancel = () async {
-      await authSubscription.cancel();
       try {
-        await userRecordSubscription?.call();
+        await authSubscription.cancel();
       } catch (error) {
         Log.warning("Unsubscribe error (safe to ignore): $error");
       }
@@ -117,6 +125,21 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
       email.toLowerCase(),
       password,
     );
+  }
+
+  @override
+  Future<String?> signInAnonymously() async {
+    return await _authenticationDataSource.signInAnonymously();
+  }
+
+  @override
+  Future<bool> createGithubUserFromAnonymous(void Function(Uri) urlCallback) async {
+    return await _authenticationDataSource.createGithubUserFromAnonymous(urlCallback);
+  }
+
+  @override
+  Future<bool> createGoogleUserFromAnonymous(void Function(Uri) urlCallback) async {
+    return await _authenticationDataSource.createGoogleUserFromAnonymous(urlCallback);
   }
 
   @override

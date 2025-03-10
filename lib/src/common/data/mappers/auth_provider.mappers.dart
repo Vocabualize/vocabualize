@@ -1,11 +1,10 @@
 import 'package:vocabualize/src/common/domain/entities/auth_provider.dart';
+import 'package:vocabualize/src/common/domain/extensions/iterable_extensions.dart';
 
 extension AuthProviderStringMappers on String {
   AuthProvider? toAuthProvider() {
-    return switch (toLowerCase()) {
-      "github" => AuthProvider.github,
-      "google" => AuthProvider.google,
-      _ => null,
-    };
+    return AuthProvider.values.firstWhereOrNull((provider) {
+      return provider?.name.toLowerCase() == toLowerCase();
+    });
   }
 }

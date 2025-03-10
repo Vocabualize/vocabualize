@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -123,17 +124,22 @@ class LocalNotificationDataSource {
       time.hour,
       time.minute,
     );
-    return await _localNotifications.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate.isBefore(now) ? scheduledDate.add(const Duration(days: 1)) : scheduledDate,
-      _getLocalNotificationDetails(channelId, channelName, channelDescription),
-      payload: payload,
-      androidScheduleMode: AndroidScheduleMode.exact,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+    try {
+      return await _localNotifications.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate.isBefore(now) ? scheduledDate.add(const Duration(days: 1)) : scheduledDate,
+        _getLocalNotificationDetails(channelId, channelName, channelDescription),
+        payload: payload,
+        androidScheduleMode:
+            kDebugMode ? AndroidScheduleMode.exactAllowWhileIdle : AndroidScheduleMode.inexact,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    } on PlatformException catch (e) {
+      Log.error("Failed to schedule local notification", exception: e);
+    }
   }
 
   // TODO: Is this in use?

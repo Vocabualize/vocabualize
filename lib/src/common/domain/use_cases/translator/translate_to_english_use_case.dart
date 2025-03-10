@@ -24,12 +24,10 @@ class TranslateToEnglishUseCase {
 
   Future<String> call(String source) async {
     final sourceLanguage = await _settingsRepository.getSourceLanguage();
-    final usePremiumTranslator = await _settingsRepository.getUsePremiumTranslator();
     return _translatorRepository.translate(
       source: source,
       sourceLanguageId: sourceLanguage.translatorId,
       targetLanguageId: Language.english().translatorId,
-      usePremiumTranslator: usePremiumTranslator,
     );
   }
 }

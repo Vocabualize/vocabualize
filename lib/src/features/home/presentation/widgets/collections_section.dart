@@ -145,7 +145,7 @@ class _ImageBox extends StatelessWidget {
       width: cardSpacing,
       height: cardSpacing,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(Dimensions.semiSmallBorderRadius),
+        borderRadius: BorderRadius.circular(Dimensions.semiSemiSmallBorderRadius),
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface.withOpacity(0.5),

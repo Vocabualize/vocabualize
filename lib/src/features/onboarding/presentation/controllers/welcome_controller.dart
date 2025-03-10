@@ -5,6 +5,7 @@ import 'package:vocabualize/src/common/domain/entities/alert.dart';
 import 'package:vocabualize/src/common/domain/entities/auth_provider.dart';
 import 'package:vocabualize/src/common/domain/extensions/object_extensions.dart';
 import 'package:vocabualize/src/common/domain/use_cases/alerts/get_alerts_use_case.dart';
+import 'package:vocabualize/src/common/domain/use_cases/authentication/sign_in_anonymously_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/authentication/sign_in_with_github_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/authentication/sign_in_with_google_use_case.dart';
 import 'package:vocabualize/src/common/presentation/extensions/context_extensions.dart';
@@ -41,10 +42,7 @@ class WelcomeController extends AutoDisposeAsyncNotifier<WelcomeState> {
       state = AsyncData(value.copyWith(loadingProvider: provider));
     });
     Future<void> callback(Uri uri) async {
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      ).then((_) {
+      await launchUrl(uri).then((_) {
         state.value?.let((value) {
           state = AsyncData(
             value.copyWith(loadingProvider: AuthProvider.none),
@@ -61,5 +59,9 @@ class WelcomeController extends AutoDisposeAsyncNotifier<WelcomeState> {
     if (linkedProvider != null && provider != linkedProvider && context.mounted) {
       context.showDialog(WrongProviderDialog(linkedProvider: linkedProvider));
     }
+  }
+
+  Future<String?> signInAnonymously() async {
+    return await ref.read(signInAnonymouslyUseCaseProvider)();
   }
 }

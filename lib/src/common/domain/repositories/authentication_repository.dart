@@ -7,6 +7,9 @@ abstract interface class AuthenticationRepository {
   Future<AuthProvider?> signInWithGoogle(void Function(Uri) urlCallback);
   Future<bool> createUserWithEmailAndPassword(String email, String password);
   Future<bool> signInWithEmailAndPasswort(String email, String password);
+  Future<String?> signInAnonymously();
+  Future<bool> createGithubUserFromAnonymous(void Function(Uri) urlCallback);
+  Future<bool> createGoogleUserFromAnonymous(void Function(Uri) urlCallback);
   Future<bool> signOut();
   Future<void> sendVerificationEmail();
   Future<void> sendPasswordResetEmail(String email);

@@ -7,6 +7,7 @@ import 'package:vocabualize/src/common/domain/extensions/object_extensions.dart'
 import 'package:vocabualize/src/common/domain/use_cases/language/get_language_by_id_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/language/read_out_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_are_images_disabled_use_case.dart';
+import 'package:vocabualize/src/common/domain/use_cases/settings/get_is_type_answer_mode_disabled_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/vocabulary/add_or_update_vocabulary_use_case.dart';
 import 'package:vocabualize/src/common/presentation/extensions/context_extensions.dart';
 import 'package:vocabualize/src/features/practice/domain/use_cases/answer_vocabulary_use_case.dart';
@@ -26,11 +27,19 @@ class PracticeController extends AutoDisposeFamilyAsyncNotifier<PracticeState, T
     List<Vocabulary> vocabulariesToPractice = ref.read(
       getVocabulariesToPracticeUseCaseProvider(tag),
     );
+    final targetLanguageIds = vocabulariesToPractice.map((v) => v.targetLanguageId).toSet();
+    final targetLangues = await Future.wait(
+      targetLanguageIds.map((id) => ref.read(getLanguageByIdUseCaseProvider)(id)),
+    );
+    final possibleArticles = targetLangues.nonNulls.map((l) => l.articles).expand((e) => e).toSet();
     return PracticeState(
+      possibleArticles: possibleArticles,
+      currentIdWithAnswer: null,
       initialVocabularyCount: vocabulariesToPractice.length,
       vocabulariesLeft: vocabulariesToPractice,
       isMultilingual: await ref.read(isCollectionMultilingualUseCaseProvider(tag)),
       isSolutionShown: false,
+      isTypedAnswerModeDisabled: await ref.read(getIsTypeAnswerModeDisabledUseCaseProvider.future),
       areImagesDisabled: await ref.read(getAreImagesDisabledUseCaseProvider.future),
     );
   }
@@ -61,8 +70,17 @@ class PracticeController extends AutoDisposeFamilyAsyncNotifier<PracticeState, T
     });
   }
 
-  void showSolution() {
-    update((previous) => previous.copyWith(isSolutionShown: true));
+  void showSolution(String? answerText) {
+    update((previous) {
+      final currentVocabularyId = previous.currentVocabulary?.id;
+      final currentIdWithAnswer = currentVocabularyId != null && answerText != null
+          ? (currentVocabularyId, answerText)
+          : null;
+      return previous.copyWith(
+        currentIdWithAnswer: currentIdWithAnswer,
+        isSolutionShown: true,
+      );
+    });
   }
 
   Future<void> answerCurrent(Answer answer) async {
@@ -76,6 +94,7 @@ class PracticeController extends AutoDisposeFamilyAsyncNotifier<PracticeState, T
       );
       await ref.read(addOrUpdateVocabularyUseCaseProvider(updatedVocabulary));
       return previous.copyWith(
+        currentIdWithAnswer: null,
         vocabulariesLeft: previous.vocabulariesLeft.sublist(1),
         isSolutionShown: false,
       );

@@ -17,6 +17,7 @@ class GetLanguageByIdUseCase {
   }) : _languageRepository = languageRepository;
 
   Future<Language?> call(String id) async {
+    if (id.isEmpty) return null;
     return _languageRepository.getLanguageById(id);
   }
 }

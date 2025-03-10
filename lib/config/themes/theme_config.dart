@@ -168,19 +168,29 @@ class ThemeConfig {
       ///* OutlinedButton
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: ButtonStyle(
-          foregroundColor: WidgetStateProperty.all<Color>(onBackground),
+          foregroundColor: WidgetStateProperty.resolveWith<Color>((state) {
+            return state.contains(WidgetState.disabled) ? hint : onSurface;
+          }),
           padding: WidgetStateProperty.all<EdgeInsets>(const EdgeInsets.fromLTRB(32, 12, 32, 12)),
-          textStyle: WidgetStateProperty.all<TextStyle>(
-            GoogleFonts.poppins(
-              color: onSurface,
+          textStyle: WidgetStateProperty.resolveWith<TextStyle>((state) {
+            final color = state.contains(WidgetState.disabled) ? hint : onSurface;
+            return GoogleFonts.poppins(
+              color: color,
               fontSize: 16,
               fontWeight: FontWeight.bold,
-            ),
-          ),
+            );
+          }),
           elevation: WidgetStateProperty.all<double>(0),
           shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-        ).copyWith(side: WidgetStateProperty.all<BorderSide>(BorderSide(width: 2, color: primary))),
+        ).copyWith(
+          side: WidgetStateProperty.resolveWith<BorderSide>((state) {
+            if (state.contains(WidgetState.disabled)) {
+              return BorderSide(width: 2, color: hint);
+            }
+            return BorderSide(width: 2, color: primary);
+          }),
+        ),
       ),
 
       ///* Dialog

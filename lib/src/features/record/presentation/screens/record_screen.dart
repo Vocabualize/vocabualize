@@ -74,7 +74,23 @@ class RecordScreen extends ConsumerWidget {
                             ),
                           ],
                         ],
-                      ],
+                      ] else ...[
+                        const SizedBox(height: Dimensions.largeSpacing),
+                        const IntrinsicHeight(
+                          child: Row(
+                            children: [
+                              AspectRatio(
+                                aspectRatio: 1 / 1,
+                                child: _SwitchCameraButton(),
+                              ),
+                              SizedBox(width: Dimensions.mediumSpacing),
+                              Expanded(
+                                child: _ZoomSlider(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ]
                     ],
                   ),
                 ),
@@ -120,6 +136,68 @@ class _CameraBox extends ConsumerWidget {
                 fit: BoxFit.cover,
               );
             }),
+    );
+  }
+}
+
+class _SwitchCameraButton extends ConsumerWidget {
+  const _SwitchCameraButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = recordControllerProvider.notifier;
+    return Material(
+      color: Theme.of(context).colorScheme.surface.withOpacity(0.25),
+      clipBehavior: Clip.hardEdge,
+      borderRadius: BorderRadius.circular(
+        Dimensions.largeBorderRadius,
+      ),
+      child: InkWell(
+        onTap: ref.read(notifier).switchCamera,
+        child: Padding(
+          padding: const EdgeInsets.all(Dimensions.mediumSpacing),
+          child: Icon(
+            Icons.cameraswitch_rounded,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ZoomSlider extends ConsumerWidget {
+  const _ZoomSlider();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = recordControllerProvider;
+    final notifier = provider.notifier;
+    final zoomLevel = ref.watch(provider.select((state) {
+      return state.valueOrNull?.zoomLevel ?? 1.0;
+    }));
+    final maxZoomLevel = ref.watch(provider.select((state) {
+      return state.valueOrNull?.maxZoomLevel ?? 1.0;
+    }));
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimensions.smallSpacing,
+        vertical: Dimensions.mediumSpacing,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface.withOpacity(0.25),
+        borderRadius: BorderRadius.circular(
+          Dimensions.largeBorderRadius,
+        ),
+      ),
+      child: Slider.adaptive(
+        value: zoomLevel,
+        min: 1.0,
+        max: maxZoomLevel,
+        onChanged: (value) {
+          ref.read(notifier).updateZoom(value);
+        },
+      ),
     );
   }
 }

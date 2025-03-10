@@ -27,6 +27,15 @@ class AppUser {
     return email?.takeUnless((e) => e.isEmpty) ?? "No email";
   }
 
+  bool get isSignedIn {
+    if (provider == null) return false;
+    return ![AuthProvider.none, AuthProvider.anonymous].contains(provider);
+  }
+
+  bool get isAnonymous {
+    return provider == AuthProvider.anonymous;
+  }
+
   const AppUser({
     this.id,
     this.provider,

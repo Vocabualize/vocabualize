@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:vocabualize/constants/secrets/google_forms_secrets.dart';
 import 'package:vocabualize/main.dart';
 import 'package:vocabualize/src/common/domain/entities/language.dart';
 import 'package:vocabualize/src/common/domain/extensions/object_extensions.dart';
@@ -11,22 +14,23 @@ import 'package:vocabualize/src/common/domain/use_cases/authentication/sign_out_
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_are_collections_enabled_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_are_images_disabled_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_gather_notification_time_use_case.dart';
+import 'package:vocabualize/src/common/domain/use_cases/settings/get_is_type_answer_mode_disabled_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_practice_notification_time_use_dart.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_source_language_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_target_language_use_case.dart';
-import 'package:vocabualize/src/common/domain/use_cases/settings/get_use_premium_translator_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/set_are_collections_enabled_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/set_are_images_disabled_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/set_gather_notification_time_use_case.dart';
+import 'package:vocabualize/src/common/domain/use_cases/settings/set_is_type_answer_mode_disabled_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/set_practice_notification_time_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/set_source_language_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/set_target_language_use_case.dart';
-import 'package:vocabualize/src/common/domain/use_cases/settings/set_use_premium_translator_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/user/update_user_use_case.dart';
 import 'package:vocabualize/src/common/presentation/extensions/context_extensions.dart';
 import 'package:vocabualize/src/common/presentation/screens/language_picker_screen.dart';
 import 'package:vocabualize/src/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:vocabualize/src/features/reports/presentation/screens/report_screen.dart';
+import 'package:vocabualize/src/features/settings/presentation/screens/auth_from_anonymous_screen.dart';
 import 'package:vocabualize/src/features/settings/presentation/states/settings_state.dart';
 import 'package:vocabualize/src/features/settings/presentation/widgets/keep_data_info_dialog.dart';
 
@@ -44,19 +48,28 @@ class SettingsController extends AutoDisposeAsyncNotifier<SettingsState> {
       isKeepDataEnabled: currentUser?.keepData ?? false,
       sourceLanguage: await ref.read(getSourceLanguageUseCaseProvider),
       targetLanguage: await ref.read(getTargetLanguageUseCaseProvider),
+      isTypeAnswerModeDisabled: await ref.read(getIsTypeAnswerModeDisabledUseCaseProvider.future),
       areCollectionsEnabled: await ref.read(getAreCollectionsEnabledUseCaseProvider.future),
       areImagesDisabled: await ref.read(getAreImagesDisabledUseCaseProvider.future),
-      usePremiumTranslator: await ref.read(getUsePremiumTranslatorUseCaseProvider.future),
       gatherNotificationTime: await ref.read(getGatherNotificationTimeUseCaseProvider),
       practiceNotificationTime: await ref.read(getPracticeNotificationTimeUseCaseProvider),
     );
+  }
+
+  Future<void> copyId() async {
+    final id = state.valueOrNull?.currentUser?.id ?? "";
+    await Clipboard.setData(ClipboardData(text: id));
+  }
+
+  Future<void> goToAnonymousAccountLinking(BuildContext context) async {
+    context.pushNamed(AuthFromAnonymousScreen.routeName);
   }
 
   Future<void> signIn(BuildContext context) async {
     // TODO: Implement signIn button for SettingsScreen
     // * Basically, this should be a sign out, but keep the data and save all data to a new user
     // ? What happens if user signs in with an existing account? Should we merge the data?
-    await ref.watch(signOutUseCaseProvider)().whenComplete(() {
+    await ref.read(signOutUseCaseProvider)().whenComplete(() {
       context.pop();
     });
   }
@@ -74,6 +87,13 @@ class SettingsController extends AutoDisposeAsyncNotifier<SettingsState> {
 
   void goToOnboarding(BuildContext context) {
     context.pushNamed(OnboardingScreen.routeName);
+  }
+
+  void openSurvey(BuildContext context) {
+    launchUrl(
+      Uri.parse(GoogleFormsSecrets.localSurveryUrl(context.s.localeName)),
+      mode: LaunchMode.inAppBrowserView,
+    );
   }
 
   void showKeepDataInfoDialog(BuildContext context) {
@@ -108,6 +128,14 @@ class SettingsController extends AutoDisposeAsyncNotifier<SettingsState> {
     });
   }
 
+  Future<void> setIsTypeAnswerModeDisabled(bool isTypeAnswerModeDisabled) async {
+    await ref.read(setIsTypeAnswerModeDisabledUseCaseProvider)(isTypeAnswerModeDisabled);
+    ref.invalidate(getIsTypeAnswerModeDisabledUseCaseProvider);
+    update((previous) {
+      return previous.copyWith(isTypeAnswerModeDisabled: isTypeAnswerModeDisabled);
+    });
+  }
+
   Future<void> setAreCollectionsEnabled(bool areCollectionsEnabled) async {
     await ref.read(setAreCollectionsEnabledUseCaseProvider)(areCollectionsEnabled);
     ref.invalidate(getAreCollectionsEnabledUseCaseProvider);
@@ -121,14 +149,6 @@ class SettingsController extends AutoDisposeAsyncNotifier<SettingsState> {
     ref.invalidate(getAreImagesDisabledUseCaseProvider);
     update((previous) {
       return previous.copyWith(areImagesDisabled: areImagesDisabled);
-    });
-  }
-
-  Future<void> setUsePremiumTranslator(bool usePremiumTranslator) async {
-    await ref.read(setUsePremiumTranslatorUseCaseProvider(usePremiumTranslator).future);
-    ref.invalidate(getUsePremiumTranslatorUseCaseProvider);
-    update((previous) {
-      return previous.copyWith(usePremiumTranslator: usePremiumTranslator);
     });
   }
 

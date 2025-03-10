@@ -26,6 +26,7 @@ import 'package:vocabualize/src/common/data/models/rdb_practice_iteration.dart';
 import 'package:vocabualize/src/common/data/models/rdb_tag.dart';
 import 'package:vocabualize/src/common/data/models/rdb_translation_report.dart';
 import 'package:vocabualize/src/common/data/models/rdb_vocabulary.dart';
+import 'package:vocabualize/src/common/domain/entities/app_user.dart';
 import 'package:vocabualize/src/common/domain/entities/tag.dart';
 import 'package:vocabualize/src/common/domain/extensions/object_extensions.dart';
 
@@ -54,7 +55,6 @@ class RemoteDatabaseDataSource {
   final String _vocabulariesCollectionName = "vocabularies";
   final String _languagesCollectionName = "languages";
   final String _tagsCollectionName = "tags";
-  final String _tagsByUserViewName = "tags_by_user";
   final String _translationReportCollectionName = "translation_reports";
   final String _bugReportCollectionName = "bug_reports";
 
@@ -68,9 +68,17 @@ class RemoteDatabaseDataSource {
     return records.items.map((record) => record.toRdbAlert()).toList();
   }
 
-  Future<pb.AuthStore> getUser() async {
+  Future<AppUser?> getUser() async {
     final pb.PocketBase pocketbase = await _connectionClient.getConnection();
-    return pocketbase.authStore;
+    try {
+      final user = await pocketbase
+          .collection(_usersCollectionName)
+          .getOne(pocketbase.authStore.toAppUser()?.id ?? "");
+      return user.toAppUser();
+    } on pb.ClientException catch (e) {
+      Log.error("Could not load user.", exception: e);
+      return null;
+    }
   }
 
   Future<void> updateUser({
@@ -232,8 +240,8 @@ class RemoteDatabaseDataSource {
     final userId = pocketbase.authStore.toAppUser()?.id;
     final String? userFilter = userId?.let((id) => "$_userFieldName=\"$id\"");
     final tagsRecords =
-        await pocketbase.collection(_tagsByUserViewName).getList(filter: userFilter);
-    return tagsRecords.items.map((record) => record.toRdbTag()).toList();
+        await pocketbase.collection(_tagsCollectionName).getFullList(filter: userFilter);
+    return tagsRecords.map((record) => record.toRdbTag()).toList();
   }
 
   Future<RdbTag> getTagById(String id) async {
@@ -244,14 +252,18 @@ class RemoteDatabaseDataSource {
 
   Future<String> createTag(RdbTag tag) async {
     final pb.PocketBase pocketbase = await _connectionClient.getConnection();
-    final data = tag.toRecordModel().toJson();
+    final userId = pocketbase.authStore.toAppUser()?.id;
+    final tagWithUser = tag.copyWith(user: userId);
+    final data = tagWithUser.toRecordModel().toJson();
     final record = await pocketbase.collection(_tagsCollectionName).create(body: data);
     return record.id;
   }
 
   Future<String> updateTag(RdbTag tag) async {
     final pb.PocketBase pocketbase = await _connectionClient.getConnection();
-    final data = tag.toRecordModel().toJson();
+    final userId = pocketbase.authStore.toAppUser()?.id;
+    final tagWithUser = tag.copyWith(user: userId);
+    final data = tagWithUser.toRecordModel().toJson();
     final recordModel = await pocketbase.collection(_tagsCollectionName).update(tag.id, body: data);
     return recordModel.id;
   }

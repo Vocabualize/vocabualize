@@ -5,6 +5,7 @@ import 'package:vocabualize/src/common/domain/entities/vocabulary_image.dart';
 import 'package:vocabualize/src/common/domain/entities/vocabulary.dart';
 import 'package:vocabualize/src/common/presentation/extensions/context_extensions.dart';
 import 'package:vocabualize/src/common/presentation/screens/loading_screen.dart';
+import 'package:vocabualize/src/common/presentation/widgets/deletion_confirmation_dialog.dart';
 import 'package:vocabualize/src/features/details/presentation/controllers/details_controller.dart';
 import 'package:vocabualize/src/features/details/presentation/states/details_state.dart';
 import 'package:vocabualize/src/features/details/presentation/widgets/image_chooser.dart';
@@ -27,7 +28,8 @@ class DetailsScreen extends ConsumerWidget {
     DetailsScreenArguments? arguments =
         ModalRoute.of(context)?.settings.arguments as DetailsScreenArguments?;
 
-    final provider = detailsControllerProvider(arguments?.vocabulary);
+    final vocabulary = arguments?.vocabulary;
+    final provider = detailsControllerProvider(vocabulary);
     final notifier = provider.notifier;
     final asyncState = ref.watch(provider);
 
@@ -86,7 +88,7 @@ class DetailsScreen extends ConsumerWidget {
                 Row(
                   children: [
                     if (state.vocabulary.id != null) ...[
-                      _DeleteButton(notifier: notifier),
+                      _DeleteButton(vocabulary),
                       const SizedBox(width: Dimensions.semiSmallSpacing),
                     ],
                     Expanded(
@@ -105,20 +107,34 @@ class DetailsScreen extends ConsumerWidget {
 }
 
 class _DeleteButton extends ConsumerWidget {
-  final Refreshable<DetailsController> notifier;
-  const _DeleteButton({required this.notifier});
+  final Vocabulary? vocabulary;
+  const _DeleteButton(this.vocabulary);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final provider = detailsControllerProvider(vocabulary);
+    final notifier = provider.notifier;
+
+    final stateVocabulary = ref.watch(provider.select((state) {
+      return state.valueOrNull?.vocabulary;
+    }));
+
+    void delete() {
+      context.showDialog(DeletionConfirmationDialog(
+        vocabulary: stateVocabulary,
+        onDelete: () {
+          ref.read(notifier).deleteVocabulary(context);
+        },
+      ));
+    }
+
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.all(Dimensions.semiSmallSpacing),
         backgroundColor: Theme.of(context).colorScheme.error.withOpacity(0.2),
         foregroundColor: Theme.of(context).colorScheme.error,
       ),
-      onPressed: () {
-        ref.read(notifier).deleteVocabulary(context);
-      },
+      onPressed: delete,
       child: const Icon(Icons.delete_rounded),
     );
   }

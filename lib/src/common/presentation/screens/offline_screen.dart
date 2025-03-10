@@ -7,27 +7,52 @@ import 'package:vocabualize/constants/asset_path.dart';
 import 'package:vocabualize/constants/common_constants.dart';
 import 'package:vocabualize/constants/dimensions.dart';
 import 'package:vocabualize/src/common/presentation/extensions/context_extensions.dart';
+import 'package:vocabualize/src/common/presentation/screens/loading_screen.dart';
 
-class OfflineScreen extends StatelessWidget {
+const _loadingDuration = Duration(milliseconds: 1000);
+
+class OfflineScreen extends StatefulWidget {
   const OfflineScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    void showWhyDialog() {
-      context.showDialog(const _WhyDialog());
-    }
+  State<OfflineScreen> createState() => _OfflineScreenState();
+}
 
-    void openInternetSettings() async {
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      final androidVersion = androidInfo.version.sdkInt;
-      if (androidVersion >= 29) {
-        // * AppSettingsPanels only work on Android, and only on >=10
-        // If minSdkVersion is high enough, we can remove this statement
-        // + perhaps, the DeviceInfoPlugin as well
-        AppSettings.openAppSettingsPanel(AppSettingsPanelType.internetConnectivity);
-      } else {
-        AppSettings.openAppSettings(type: AppSettingsType.wifi);
-      }
+class _OfflineScreenState extends State<OfflineScreen> {
+  bool showLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(_loadingDuration);
+      if (mounted) setState(() => showLoading = false);
+    });
+  }
+
+  void _showWhyDialog() {
+    context.showDialog(const _WhyDialog());
+  }
+
+  void _openInternetSettings() async {
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    final androidVersion = androidInfo.version.sdkInt;
+    if (androidVersion >= 29) {
+      // * AppSettingsPanels only work on Android, and only on >=10
+      // If minSdkVersion is high enough, we can remove this statement
+      // + perhaps, the DeviceInfoPlugin as well
+      AppSettings.openAppSettingsPanel(AppSettingsPanelType.internetConnectivity);
+    } else {
+      AppSettings.openAppSettings(type: AppSettingsType.wifi);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // * Show fake loading first, so the user won't get annoyed by offline screen
+    if (showLoading) {
+      return const LoadingScreen();
     }
 
     return Scaffold(
@@ -46,7 +71,7 @@ class OfflineScreen extends StatelessWidget {
                   const Expanded(child: _AppTitle()),
                   IconButton(
                     icon: const Icon(Icons.help_rounded),
-                    onPressed: showWhyDialog,
+                    onPressed: _showWhyDialog,
                   ),
                 ],
               ),
@@ -75,7 +100,7 @@ class OfflineScreen extends StatelessWidget {
               if (Platform.isAndroid) ...[
                 const SizedBox(height: Dimensions.largeSpacing),
                 OutlinedButton(
-                  onPressed: openInternetSettings,
+                  onPressed: _openInternetSettings,
                   child: Text(context.s.offline_internet_settings_button),
                 ),
               ],

@@ -2,18 +2,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vocabualize/src/common/data/repositories/settings_repository_impl.dart';
 import 'package:vocabualize/src/common/domain/repositories/settings_repository.dart';
 
-final getUsePremiumTranslatorUseCaseProvider = AutoDisposeFutureProvider((ref) {
-  return GetUsePremiumTranslatorUseCase(
+final getIsTypeAnswerModeDisabledUseCaseProvider = AutoDisposeFutureProvider((ref) {
+  return GetIsTypeAnswerModeDisabledUseCase(
     settingsRepository: ref.watch(settingsRepositoryProvider),
   ).call();
 });
 
-class GetUsePremiumTranslatorUseCase {
+class GetIsTypeAnswerModeDisabledUseCase {
   final SettingsRepository _settingsRepository;
 
-  const GetUsePremiumTranslatorUseCase({
+  const GetIsTypeAnswerModeDisabledUseCase({
     required SettingsRepository settingsRepository,
   }) : _settingsRepository = settingsRepository;
 
-  Future<bool> call() => _settingsRepository.getUsePremiumTranslator();
+  Future<bool> call() => _settingsRepository.getIsTypeAnswerModeDisabled();
 }

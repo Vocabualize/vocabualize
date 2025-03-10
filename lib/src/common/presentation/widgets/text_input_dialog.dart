@@ -20,10 +20,17 @@ class TextInputDialog extends StatefulWidget {
 }
 
 class _TextInputDialogState extends State<TextInputDialog> {
+  final _focusNode = FocusNode();
   String _text = "";
 
   void _updateText(String text) {
     setState(() => _text = text);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.requestFocus();
   }
 
   @override
@@ -40,7 +47,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
           children: [
             Expanded(
               child: TextField(
-                focusNode: FocusNode()..requestFocus(),
+                focusNode: _focusNode,
                 onChanged: _updateText,
                 textInputAction: TextInputAction.go,
                 onSubmitted: widget.onSave,
@@ -54,7 +61,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
             ),
             const SizedBox(width: Dimensions.smallSpacing),
             IconButton(
-              onPressed: _text.isEmpty ? widget.onCancel : () => widget.onSave(_text),
+              onPressed: _text.isEmpty ? widget.onCancel : () => widget.onSave(_text.trim()),
               icon: switch (_text.isEmpty) {
                 true => const Icon(Icons.close_rounded),
                 false => const Icon(Icons.arrow_forward_rounded),

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vocabualize/src/common/domain/entities/language.dart';
-import 'package:vocabualize/src/common/domain/extensions/object_extensions.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_source_language_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_target_language_use_case.dart';
+import 'package:vocabualize/src/common/domain/use_cases/settings/set_is_type_answer_mode_disabled_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/set_source_language_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/set_target_language_use_case.dart';
 import 'package:vocabualize/src/common/presentation/extensions/context_extensions.dart';
@@ -21,6 +21,8 @@ class ChooseLanguagesController extends AutoDisposeAsyncNotifier<ChooseLanguages
   @override
   Future<ChooseLanguagesState> build() async {
     return ChooseLanguagesState(
+      hasChosenSourceLanguage: false,
+      hasChosenTargetLanguage: false,
       selectedSourceLanguage: await ref.watch(getSourceLanguageUseCaseProvider),
       selectedTargetLanguage: await ref.watch(getTargetLanguageUseCaseProvider),
     );
@@ -28,37 +30,38 @@ class ChooseLanguagesController extends AutoDisposeAsyncNotifier<ChooseLanguages
 
   Future<void> openPickerAndSelectSourceLanguage(BuildContext context) async {
     final seletectedLanguage = await context.pushNamed(LanguagePickerScreen.routeName) as Language?;
-
     if (seletectedLanguage == null) return;
-
-    state.value?.let((value) {
-      state = AsyncData(
-        value.copyWith(selectedSourceLanguage: seletectedLanguage),
+    update((current) {
+      return current.copyWith(
+        hasChosenSourceLanguage: true,
+        selectedSourceLanguage: seletectedLanguage,
       );
     });
   }
 
   Future<void> openPickerAndSelectTargetLanguage(BuildContext context) async {
     final seletectedLanguage = await context.pushNamed(LanguagePickerScreen.routeName) as Language?;
-
     if (seletectedLanguage == null) return;
-
-    state.value?.let((value) {
-      state = AsyncData(
-        value.copyWith(selectedTargetLanguage: seletectedLanguage),
+    update((current) {
+      return current.copyWith(
+        hasChosenTargetLanguage: true,
+        selectedTargetLanguage: seletectedLanguage,
       );
     });
   }
 
   Future<void> done(BuildContext context) async {
-    state.value?.let((value) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+    if (current.selectedTargetLanguage.isNonLatin) {
+      await ref.read(setIsTypeAnswerModeDisabledUseCaseProvider)(true);
+    }
+    await ref
+        .read(setSourceLanguageUseCaseProvider(current.selectedSourceLanguage))
+        .then((_) async {
       await ref
-          .read(setSourceLanguageUseCaseProvider(value.selectedSourceLanguage))
-          .then((_) async {
-        await ref
-            .read(setTargetLanguageUseCaseProvider(value.selectedTargetLanguage))
-            .then((_) => context.pop());
-      });
+          .read(setTargetLanguageUseCaseProvider(current.selectedTargetLanguage))
+          .then((_) => context.pop());
     });
   }
 }

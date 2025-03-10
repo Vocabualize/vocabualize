@@ -1,8 +1,8 @@
 name: vocabualize
-description: Capture vocabularies around you.
+description: Capture vocabulary from your daily life.
 
 publish_to: 'none'
-version: 0.1.1+1
+version: 0.1.9+12
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -22,8 +22,9 @@ dependencies:
   app_settings: ^5.2.0
   cached_network_image: ^3.4.1
   camera: ^0.10.6
-  collection: ^1.18.0
   device_info_plus: ^11.3.0
+  diacritic: ^0.1.6
+  diff_match_patch: ^0.4.1
   flutter_image_compress: ^2.0.4
   flutter_local_notifications: ^17.2.1+2
   flutter_riverpod: ^2.5.1
@@ -42,10 +43,10 @@ dependencies:
   path_provider: ^2.1.5
   permission_handler: ^11.3.1
   pocketbase: ^0.18.1
-  provider: ^6.0.3
   shared_preferences: ^2.0.18
   timezone: ^0.9.4
   translator_plus: ^1.0.1
+  uuid: ^4.5.1
   url_launcher: ^6.1.10
 
   # styling
@@ -75,6 +76,7 @@ flutter:
     - assets/images/mascot/mascot_idle.webp
     - assets/images/mascot/mascot_search.webp
     - assets/images/mascot/mascot_offline.webp
+    - assets/images/mascot/mascot_waving.webp
     - assets/images/fallback/fallback_default.webp
     #- assets/ml_models/efficientnet_lite4-fp32.tflite
 

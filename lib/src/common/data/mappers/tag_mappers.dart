@@ -6,6 +6,7 @@ extension RecordModelTagMappers on RecordModel {
   RdbTag toRdbTag() {
     return RdbTag(
       id: id,
+      user: getStringValue("user"),
       name: data['name'],
       created: data['created'],
       updated: data['updated'],
@@ -17,6 +18,7 @@ extension RdbTagMappers on RdbTag {
   Tag toTag() {
     return Tag(
       id: id,
+      userId: user,
       name: name,
     );
   }
@@ -25,7 +27,8 @@ extension RdbTagMappers on RdbTag {
     return RecordModel(
       id: id,
       data: {
-        'name': name,
+        "user": user,
+        "name": name,
       },
     );
   }
@@ -35,6 +38,7 @@ extension TagMappers on Tag {
   RdbTag toRdbTag() {
     return RdbTag(
       id: id ?? "",
+      user: userId ?? "",
       name: name,
     );
   }

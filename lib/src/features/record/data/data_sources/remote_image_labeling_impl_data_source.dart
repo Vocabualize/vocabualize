@@ -14,8 +14,9 @@ final remoteImageLabelingDataSourceProvider = Provider<ImageLabelingDataSource>(
 
 class RemoteImageLabelingDataSourceImpl implements ImageLabelingDataSource {
   final _apiKey = GeminiSecrets.apiKey;
+  // TODO: Move _baseModelsUrl, _modelName and _functionName to a remote config
   final _baseModelsUrl = "https://generativelanguage.googleapis.com/v1beta/models";
-  final _modelName = "gemini-2.0-flash-lite-preview-02-05";
+  final _modelName = "gemini-2.0-flash-lite";
   final _functionName = "generateContent";
 
   final _maxTokens = 512;
@@ -111,7 +112,7 @@ class RemoteImageLabelingDataSourceImpl implements ImageLabelingDataSource {
     final List? candidates = jsonResponse["candidates"];
 
     if (candidates == null || candidates.isEmpty) {
-      Log.warning("No candidates found in response.");
+      Log.warning("No candidates found in response. Response:\n$responseBody");
       return {};
     }
 

@@ -153,7 +153,7 @@ class _RetakeButton extends ConsumerWidget {
             Icon(
               Icons.replay_rounded,
               color: Theme.of(context).colorScheme.onPrimary,
-              size: Dimensions.mediumIconSize,
+              size: Dimensions.smallIconSize,
             ),
             const SizedBox(width: Dimensions.smallSpacing),
             Text(
@@ -201,7 +201,7 @@ class _PhotographerLink extends ConsumerWidget {
             const SizedBox(width: Dimensions.smallSpacing),
             Icon(
               Icons.launch_rounded,
-              size: Dimensions.mediumIconSize,
+              size: Dimensions.smallIconSize,
               color: Theme.of(context).colorScheme.onPrimary,
             ),
             const SizedBox(width: Dimensions.smallSpacing),

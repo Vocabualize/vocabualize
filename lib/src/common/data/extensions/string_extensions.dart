@@ -2,6 +2,10 @@ import 'package:log/log.dart';
 import 'package:vocabualize/constants/secrets/pocketbase_secrets.dart';
 
 extension StringExtensions on String {
+  bool equalsNormalized(String other) {
+    return toLowerCase().trim() == other.toLowerCase().trim();
+  }
+
   // TODO: Remove String.toFileUrl() extension and find an alternative using pb.files.getUrl(record, filename)
   String? toFileUrl(String recordId, String collectionName) {
     if (isEmpty) return null;

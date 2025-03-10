@@ -14,8 +14,11 @@ import 'package:vocabualize/src/common/presentation/extensions/context_extension
 import 'package:vocabualize/src/common/presentation/extensions/vocabulary_image_extensions.dart';
 import 'package:vocabualize/src/common/presentation/screens/loading_screen.dart';
 import 'package:vocabualize/src/features/home/presentation/screens/home_screen.dart';
+import 'package:vocabualize/src/features/practice/domain/extensions/string_extensions.dart';
+import 'package:vocabualize/src/features/practice/domain/use_cases/get_difficulty_from_text_answer_use_case.dart';
 import 'package:vocabualize/src/features/practice/presentation/controllers/practice_controller.dart';
 import 'package:vocabualize/src/common/domain/entities/answer.dart';
+import 'package:vocabualize/src/features/practice/presentation/widgets/solution_diff_text.dart';
 
 class PracticeScreenArguments {
   final Tag tag;
@@ -60,13 +63,25 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
       return state.value?.initialVocabularyCount;
     }));
 
-    if (isDone == null || initialVocabularyCount == null || doneCount == null) {
+    if (isDone == null || doneCount == null || initialVocabularyCount == null) {
       return LoadingScreen(onCancel: context.pop);
     }
 
     if (isDone) {
       return _PracticeDoneScreen(tag);
     }
+
+    final isSolutionShown = ref.watch(provider.select((state) {
+      return state.valueOrNull?.isSolutionShown ?? false;
+    }));
+
+    final shouldAskForTextAnswer = ref.watch(provider.select((state) {
+      return state.valueOrNull?.shouldAskForTextAnswer ?? false;
+    }));
+
+    final areImagesDisabled = ref.watch(provider.select((state) {
+      return state.valueOrNull?.areImagesDisabled ?? false;
+    }));
 
     return PopScope(
       onPopInvoked: (_) {
@@ -83,22 +98,42 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
             padding: const EdgeInsets.symmetric(
               horizontal: Dimensions.extraLargeSpacing,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: Dimensions.largeSpacing),
-                _ProgressBar(tag),
-                const Spacer(),
-                _MultilingualLabel(tag),
-                const SizedBox(height: Dimensions.semiSmallSpacing),
-                _ImageOrSolutionBox(tag),
-                const SizedBox(height: Dimensions.largeSpacing),
-                _SourceText(tag),
-                const Spacer(),
-                _RateButtons(tag),
-                const SizedBox(height: Dimensions.mediumSpacing),
-                _ShowSolutionOrForgotButton(tag),
-                const SizedBox(height: Dimensions.extraExtraLargeSpacing),
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: Dimensions.largeSpacing),
+                      _ProgressBar(tag),
+                      const SizedBox(height: Dimensions.mediumSpacing),
+                      if (areImagesDisabled)
+                        const SizedBox(height: Dimensions.extraExtraLargeSpacing),
+                      _MultilingualLabel(tag),
+                      const SizedBox(height: Dimensions.semiSmallSpacing),
+                      _ImageOrSolutionBox(tag),
+                      const SizedBox(height: Dimensions.largeSpacing),
+                      _SourceText(tag),
+                      const SizedBox(height: Dimensions.mediumSpacing),
+                    ],
+                  ),
+                ),
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Spacer(),
+                      if (isSolutionShown) _RateButtons(tag),
+                      const SizedBox(height: Dimensions.mediumSpacing),
+                      if (!isSolutionShown && shouldAskForTextAnswer)
+                        _AnswerTextField(tag)
+                      else
+                        _ShowSolutionOrForgotButton(tag),
+                      const SizedBox(height: Dimensions.extraExtraLargeSpacing)
+                    ],
+                  ),
+                )
               ],
             ),
           ),
@@ -332,28 +367,48 @@ class _Solution extends ConsumerWidget {
     final currentVocabularyTarget = ref.watch(provider.select((state) {
       return state.valueOrNull?.currentVocabulary?.target ?? "";
     }));
+    final givenAnswer = ref.watch(provider.select((state) {
+      return state.valueOrNull?.currentAnswer;
+    }));
+    final articles = ref.watch(provider.select((state) {
+      return state.valueOrNull?.possibleArticles ?? {};
+    }));
+    final textAnswerDifficulty = ref.watch(getDifficultyFromTextAnswerProvider)(
+      givenAnswer,
+      currentVocabularyTarget,
+      possibleArticles: articles,
+    );
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface.withOpacity(0.75),
+        border: Border.all(
+          color: switch (textAnswerDifficulty) {
+            Answer.forgot => LevelPalette.novice,
+            Answer.hard => LevelPalette.beginner,
+            Answer.good => LevelPalette.advanced,
+            Answer.easy => LevelPalette.expert,
+            null => Colors.transparent,
+          },
+          width: Dimensions.largeBorderWidth,
+        ),
         borderRadius: BorderRadius.circular(Dimensions.semiLargeBorderRadius),
       ),
       child: Center(
-          child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: Text(
-              currentVocabularyTarget,
-              style: Theme.of(context).textTheme.headlineMedium,
-              maxLines: 7,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: SolutionDiffText(
+                givenAnswerText: givenAnswer ?? currentVocabularyTarget,
+                solutionText: currentVocabularyTarget,
+                maxLines: 7,
+              ),
             ),
-          ),
-          const SizedBox(width: Dimensions.smallSpacing),
-          _AudioButton(tag),
-        ],
-      )),
+            const SizedBox(width: Dimensions.smallSpacing),
+            _AudioButton(tag),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -414,43 +469,36 @@ class _RateButtons extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = practiceControllerProvider(tag);
-    final isSolutionShown = ref.watch(provider.select((state) {
-      return state.valueOrNull?.isSolutionShown ?? false;
-    }));
-    return Opacity(
-      opacity: isSolutionShown ? 1 : 0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: _RateButton(
-              tag,
-              answer: Answer.hard,
-              color: LevelPalette.beginner,
-              text: context.s.practice_rating_hardButton,
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: _RateButton(
+            tag,
+            answer: Answer.hard,
+            color: LevelPalette.beginner,
+            text: context.s.practice_rating_hardButton,
           ),
-          const SizedBox(width: Dimensions.semiSmallSpacing),
-          Expanded(
-            child: _RateButton(
-              tag,
-              answer: Answer.good,
-              color: LevelPalette.advanced,
-              text: context.s.practice_rating_goodButton,
-            ),
+        ),
+        const SizedBox(width: Dimensions.semiSmallSpacing),
+        Expanded(
+          child: _RateButton(
+            tag,
+            answer: Answer.good,
+            color: LevelPalette.advanced,
+            text: context.s.practice_rating_goodButton,
           ),
-          const SizedBox(width: Dimensions.semiSmallSpacing),
-          Expanded(
-            child: _RateButton(
-              tag,
-              answer: Answer.easy,
-              color: LevelPalette.expert,
-              text: context.s.practice_rating_easyButton,
-            ),
+        ),
+        const SizedBox(width: Dimensions.semiSmallSpacing),
+        Expanded(
+          child: _RateButton(
+            tag,
+            answer: Answer.easy,
+            color: LevelPalette.expert,
+            text: context.s.practice_rating_easyButton,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -469,7 +517,30 @@ class _RateButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = practiceControllerProvider(tag).notifier;
+    final provider = practiceControllerProvider(tag);
+    final notifier = provider.notifier;
+    final givenAnswer = ref.watch(provider.select((state) {
+      return state.valueOrNull?.currentAnswer;
+    }));
+    final currentVocabularyTarget = ref.watch(provider.select((state) {
+      return state.valueOrNull?.currentVocabulary?.target ?? "";
+    }));
+    final articles = ref.watch(provider.select((state) {
+      return state.valueOrNull?.possibleArticles ?? {};
+    }));
+    final textAnswerDifficulty = ref.watch(getDifficultyFromTextAnswerProvider)(
+      givenAnswer,
+      currentVocabularyTarget,
+      possibleArticles: articles,
+    );
+    // TODO: Refactor isEnabled logic for practice rate buttons (and move)
+    final isEnabled = switch (textAnswerDifficulty) {
+      null => true,
+      Answer.forgot => [Answer.forgot].contains(answer),
+      Answer.hard => [Answer.forgot, Answer.hard].contains(answer),
+      Answer.good => [Answer.hard, Answer.good].contains(answer),
+      Answer.easy => [Answer.good, Answer.easy].contains(answer),
+    };
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(
@@ -477,16 +548,96 @@ class _RateButton extends ConsumerWidget {
         ),
         backgroundColor: color,
       ),
-      onPressed: () {
-        ref.read(notifier).answerCurrent(answer);
-        ref.read(trackEventUseCaseProvider)(switch (answer) {
-          Answer.forgot => TrackingConstants.practiceAnswerForgot,
-          Answer.hard => TrackingConstants.practiceAnswerHard,
-          Answer.good => TrackingConstants.practiceAnswerGood,
-          Answer.easy => TrackingConstants.practiceAnswerEasy,
-        });
-      },
+      onPressed: isEnabled
+          ? () {
+              ref.read(notifier).answerCurrent(answer);
+              ref.read(trackEventUseCaseProvider)(switch (answer) {
+                Answer.forgot => TrackingConstants.practiceAnswerForgot,
+                Answer.hard => TrackingConstants.practiceAnswerHard,
+                Answer.good => TrackingConstants.practiceAnswerGood,
+                Answer.easy => TrackingConstants.practiceAnswerEasy,
+              });
+            }
+          : null,
       child: Text(text),
+    );
+  }
+}
+
+class _AnswerTextField extends ConsumerStatefulWidget {
+  final Tag? tag;
+  const _AnswerTextField(this.tag);
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => __AnswerTextFieldState();
+}
+
+class __AnswerTextFieldState extends ConsumerState<_AnswerTextField> {
+  final _answerTextController = TextEditingController();
+  bool _isAnswerTextEmpty = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _answerTextController.addListener(() {
+      setState(() {
+        _isAnswerTextEmpty = _answerTextController.text.isEmpty;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _answerTextController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = practiceControllerProvider(widget.tag);
+
+    // * Give the first article to reduce frustration if forgotten
+    // TODO: Move addFirstArticleIfEmpty logic to PracticeController
+    void addFirstArticleIfEmpty() async {
+      if (!_isAnswerTextEmpty) return;
+      final articles = ref.read(provider.select((state) {
+        return state.valueOrNull?.possibleArticles ?? {};
+      }));
+      _answerTextController.text = ref.read(provider.select((state) {
+        return state.valueOrNull?.currentVocabulary?.target.findFirstArticle(articles) ?? "";
+      }));
+    }
+
+    void hideKeyboard() {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+
+    return TextField(
+      controller: _answerTextController,
+      onTap: addFirstArticleIfEmpty,
+      onTapOutside: (_) => hideKeyboard(),
+      onEditingComplete: hideKeyboard,
+      onSubmitted: (answer) {
+        ref.read(provider.notifier).showSolution(_answerTextController.text);
+      },
+      autocorrect: false,
+      autofillHints: null,
+      enableSuggestions: false,
+      decoration: InputDecoration(
+        label: Text(context.s.practice_answer_text_field_label),
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        suffixIcon: _isAnswerTextEmpty
+            ? null
+            : IconButton(
+                onPressed: () {
+                  ref.read(provider.notifier).showSolution(_answerTextController.text);
+                },
+                icon: const Icon(Icons.done_rounded),
+              ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(Dimensions.smallSpacing),
+        ),
+      ),
     );
   }
 }
@@ -518,7 +669,7 @@ class _ShowSolutionButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = practiceControllerProvider(tag).notifier;
     return ElevatedButton(
-      onPressed: ref.read(notifier).showSolution,
+      onPressed: () => ref.read(notifier).showSolution(null),
       child: Text(
         context.s.practice_solutionButton,
       ),
@@ -532,16 +683,32 @@ class _ForgotButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = practiceControllerProvider(tag).notifier;
+    final provider = practiceControllerProvider(tag);
+    final notifier = provider.notifier;
+    final givenAnswer = ref.watch(provider.select((state) {
+      return state.valueOrNull?.currentAnswer;
+    }));
+    final currentVocabularyTarget = ref.watch(provider.select((state) {
+      return state.valueOrNull?.currentVocabulary?.target ?? "";
+    }));
+    final articles = ref.watch(provider.select((state) {
+      return state.valueOrNull?.possibleArticles ?? {};
+    }));
+    final textAnswerDifficulty = ref.watch(getDifficultyFromTextAnswerProvider)(
+      givenAnswer,
+      currentVocabularyTarget,
+      possibleArticles: articles,
+    );
+    // TODO: Refactor isEnabled logic for practice forgot button (and combine with rate buttons)
+    final isEnabled = [Answer.forgot, Answer.hard, null].contains(textAnswerDifficulty);
     return OutlinedButton(
-      onPressed: () {
-        ref.read(notifier).answerCurrent(Answer.forgot);
-        ref.read(trackEventUseCaseProvider)(TrackingConstants.practiceAnswerForgot);
-      },
-      child: Text(
-        context.s.practice_rating_didntKnowButton,
-        style: const TextStyle(color: LevelPalette.novice),
-      ),
+      onPressed: isEnabled
+          ? () {
+              ref.read(notifier).answerCurrent(Answer.forgot);
+              ref.read(trackEventUseCaseProvider)(TrackingConstants.practiceAnswerForgot);
+            }
+          : null,
+      child: Text(context.s.practice_rating_didntKnowButton),
     );
   }
 }

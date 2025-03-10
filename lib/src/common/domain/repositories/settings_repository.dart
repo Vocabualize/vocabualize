@@ -14,14 +14,14 @@ abstract interface class SettingsRepository {
   Future<Language> getTargetLanguage();
   Future<void> setTargetLanguage(Language language);
 
+  Future<bool> getIsTypeAnswerModeDisabled();
+  Future<void> setIsTypeAnswerModeDisabled(bool isTypeAnswerModeDisabled);
+
   Future<bool> getAreCollectionsEnabled();
   Future<void> setAreCollectionsEnabled(bool areCollectionsEnabled);
 
   Future<bool> getAreImagesDisabled();
   Future<void> setAreImagesDisabled(bool areImagesDisabled);
-
-  Future<bool> getUsePremiumTranslator();
-  Future<void> setUsePremiumTranslator(bool usePremiumTranslator);
 
   Future<int> getInitialInterval();
   Future<void> setInitialInterval(int initialInterval);

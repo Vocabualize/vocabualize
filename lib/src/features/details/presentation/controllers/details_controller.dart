@@ -8,6 +8,8 @@ import 'package:vocabualize/src/common/domain/entities/vocabulary_image.dart';
 import 'package:vocabualize/src/common/domain/extensions/object_extensions.dart';
 import 'package:vocabualize/src/common/domain/use_cases/settings/get_are_collections_enabled_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/tag/add_or_update_tag_use_case.dart';
+import 'package:vocabualize/src/common/domain/use_cases/tag/get_all_tags_use_case.dart';
+import 'package:vocabualize/src/common/domain/use_cases/tag/get_tags_by_ids_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/translator/translate_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/vocabulary/get_new_vocabularies_use_case.dart';
 import 'package:vocabualize/src/common/domain/use_cases/vocabulary/get_vocabularies_use_case.dart';
@@ -182,17 +184,19 @@ class DetailsController extends AutoDisposeFamilyAsyncNotifier<DetailsState, Voc
 
   Future<void> addOrRemoveTag(String? tagId) async {
     if (tagId == null) return;
-    state.value?.let((value) {
-      final tagIds = value.vocabulary.tagIds;
-      final updatedTagIds = switch (tagIds.contains(tagId)) {
-        true => tagIds.where((id) => id != tagId).toList(),
-        false => [...tagIds, tagId],
-      };
-      final updatedVocabulary = value.vocabulary.copyWith(
-        tagIds: updatedTagIds,
+    final tagIds = state.valueOrNull?.vocabulary.tagIds;
+    if (tagIds == null) return;
+    final updatedTagIds = switch (tagIds.contains(tagId)) {
+      true => tagIds.where((id) => id != tagId).toList(),
+      false => [...tagIds, tagId],
+    };
+    update((current) {
+      return current.copyWith(
+        vocabulary: current.vocabulary.copyWith(tagIds: updatedTagIds),
       );
-      state = AsyncData(value.copyWith(vocabulary: updatedVocabulary));
     });
+    ref.invalidate(getAllTagsUseCaseProvider);
+    ref.invalidate(getTagsByIdsUseCaseProvider);
   }
 
   void deleteVocabulary(BuildContext context) {

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:log/log.dart';
 import 'package:vocabualize/config/themes/theme_config.dart';
 import 'package:vocabualize/constants/global.dart';
+import 'package:vocabualize/src/common/presentation/widgets/error_placeholder.dart';
 import 'package:vocabualize/src/features/collections/presentation/screens/collection_screen.dart';
 import 'package:vocabualize/src/common/presentation/widgets/start.dart';
 import 'package:vocabualize/src/features/home/presentation/screens/home_screen.dart';
@@ -19,6 +20,7 @@ import 'package:vocabualize/src/features/details/presentation/screens/details_sc
 import 'package:vocabualize/src/features/record/presentation/screens/record_screen.dart';
 import 'package:vocabualize/src/features/reports/presentation/screens/report_screen.dart';
 import 'package:vocabualize/src/common/presentation/screens/language_picker_screen.dart';
+import 'package:vocabualize/src/features/settings/presentation/screens/auth_from_anonymous_screen.dart';
 import 'package:vocabualize/src/features/settings/presentation/screens/settings_screen.dart';
 
 void main() {
@@ -75,6 +77,8 @@ class _VocabualizeState extends State<Vocabualize> {
           Locale('en', ''),
           Locale('de', ''),
           Locale('es', ''),
+          Locale('fr', ''),
+          Locale('uk', ''),
         ],
         localeResolutionCallback: (locale, supportedLocales) {
           for (final supportedLocale in supportedLocales) {
@@ -104,6 +108,11 @@ class _VocabualizeState extends State<Vocabualize> {
           CollectionScreen.routeName: (context) => const CollectionScreen(),
           ReportScreen.routeName: (context) => const ReportScreen(),
           SettingsScreen.routeName: (context) => const SettingsScreen(),
+          AuthFromAnonymousScreen.routeName: (context) => const AuthFromAnonymousScreen(),
+        },
+        builder: (BuildContext context, Widget? child) {
+          ErrorWidget.builder = (_) => const ErrorPlaceholder();
+          return child ?? widget;
         },
       ),
     );
